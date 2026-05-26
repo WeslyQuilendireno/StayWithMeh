@@ -1,8 +1,235 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
+    ViewData["ActivePage"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- ═══════════════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════════════ -->
+<section class="relative h-[600px] w-full overflow-hidden">
+    <img class="w-full h-full object-cover brightness-[0.85]"
+         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNFzNHCxwNXQ3EVhUYE4LYUu44qBjWlUgk5IejMWuh_ilCCxePf24gLGDUWDM9jNiWb6inxwlvT_1p9w_ViIhg36JZ9sCENrv-XkS40eqRRi1GiR5jLsp13ZeDQgArDpnhZ-kyi6QjCmaxvR7pLLdSp8OD0Fl4h5_rBvkE01Um4ZG_m1B0ww6YrseBZsBGjFsz-J4Ay-uTn6aCV3iAaVJVTGQaZo4D9TZrA8OHuNTwyu-KWqQZennrCD0VGqBJcx6aSadCvKugIVh2"
+         alt="Luxury Hotel Lobby" />
+
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex flex-col justify-center items-center px-md text-center">
+        <h1 class="text-white font-display-lg text-display-lg max-w-4xl mb-md">Redefining Elegance in Every Stay</h1>
+        <p class="text-white/90 font-body-lg text-body-lg max-w-2xl">
+            Experience the pinnacle of hospitality where modern technology meets timeless luxury. Your perfect room is just a search away.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="w-full max-w-5xl mt-10 bg-surface-container-lowest shadow-lg rounded-xl flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-outline-variant border border-outline-variant overflow-hidden text-left">
+
+            <!-- Where To -->
+            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
+                <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Where To?</span>
+                <div class="flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">location_on</span>
+                    <input class="bg-transparent border-none focus:ring-0 font-headline-sm text-headline-sm p-0 w-full text-on-surface placeholder:text-outline-variant"
+                           placeholder="Search destinations..." type="text" name="destination" />
+                </div>
+            </div>
+
+            <!-- Check-in / Check-out -->
+            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
+                <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Check-in - Check-out</span>
+                <div class="flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">calendar_month</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface" id="dateDisplay">Oct 24 - Oct 28</span>
+                </div>
+            </div>
+
+            <!-- Guests & Rooms -->
+            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
+                <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Guests &amp; Rooms</span>
+                <div class="flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">group</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface">2 Guests, 1 Room</span>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <a asp-controller="Explore" asp-action="Index"
+               class="bg-primary flex items-center justify-center p-md md:w-32 group cursor-pointer hover:bg-primary-container transition-colors">
+                <span class="material-symbols-outlined text-white text-3xl group-hover:scale-125 transition-transform">search</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     ROOM TYPES BENTO GRID
+═══════════════════════════════════════════════ -->
+<section class="mt-24 max-w-[1440px] mx-auto px-lg pb-xl">
+    <div class="flex justify-between items-end mb-xl">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-primary">Our Curated Room Types</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Meticulously designed spaces for every kind of journey.</p>
+        </div>
+        <a asp-controller="Explore" asp-action="Index" class="flex items-center gap-xs text-primary font-bold hover:gap-sm transition-all">
+            View All Suites <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter h-[800px] md:h-[650px]">
+
+        <!-- Standard Room — Tall Left -->
+        <div class="md:col-span-1 md:row-span-2 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqqI9kbww6eV45YlhXLIRh2PN1qiT-PWEAkJ18D9Mw8K9RWzpgl9rX-2AcUxKfwH846XnDlkRl-pc5Cmrp2snvXwTzBSu39AUa-2cMU6O2LqSojkxn2f5eXtCGXUjSEl8vcKwZ3eqopbOq73d-Qe9Z-YRWHaRv6IO0shpM2lvowBuXWqbBTCu5oq9-vs95yVIMFH4MFi-7rNrxXzCU-LRImuZkNg8xb6Z-rAaPsOaq_tQ3u-AmJaaShVaDKQKArPzHpf65Riw4Ja1J"
+                 alt="Standard Room" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
+                <span class="bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full w-fit mb-xs">Available</span>
+                <h3 class="text-white font-headline-md text-headline-md">Standard Room</h3>
+                <p class="text-white/80 font-body-sm text-body-sm mb-md">Essential comfort with a modern touch.</p>
+                <div class="flex justify-between items-center pt-md border-t border-white/20">
+                    <span class="text-white font-headline-sm text-headline-sm">$129<span class="text-body-sm font-normal">/night</span></span>
+                    <a asp-controller="Room" asp-action="Details" asp-route-type="standard"
+                       class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deluxe Suite — Wide Top -->
+        <div class="md:col-span-2 md:row-span-1 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_suLpOh-TdyQFYzlr-aPyIubFw6SmVGI-bc0c8iahe5aG9KwLvOk5S0lRbka_-K8lemu-6Wnhny0wFJhvyMgpJuiIxLtSzxn1enUtWml79CvJ1sefIAlOpj4-piTWtijswYIp5vQyDEzuDQO0bXsSTzLwH8xIEqp5eX_7Zgq68F0KVpqIeYGZCfMnB4Bt9w4vdT7JdDAyxIzIwv1aM8piRSL3ofTqP80nprtHPb2FKhLMnK1_Ho5oZCeTRUR8PIWXsN42yqxEh7Gs"
+                 alt="Deluxe Suite" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
+                <span class="bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full w-fit mb-xs">Featured</span>
+                <h3 class="text-white font-headline-md text-headline-md">Deluxe Suite</h3>
+                <p class="text-white/80 font-body-sm text-body-sm mb-md">Spacious elegance for the discerning traveler.</p>
+                <div class="flex justify-between items-center pt-md border-t border-white/20">
+                    <span class="text-white font-headline-sm text-headline-sm">$249<span class="text-body-sm font-normal">/night</span></span>
+                    <a asp-controller="Room" asp-action="Details" asp-route-type="deluxe"
+                       class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Suite — Right -->
+        <div class="md:col-span-1 md:row-span-1 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQqaEa6AdaLB1yJDn5qyqt-H0eOKBaTkuW2NDJ5YuzwBmx04mCliMlQzcYi_xnQv2oKSFsp68pPOQ9gyxwcl1Hr5e0xEFnDIHxMhvFDtn25t5l7zrpEA5Px4JPuX5PpkcYwhw21Vqvwrm8e4LaAzdpV564zituGDk-qjaCe_JZO0HmgQVjMSeral9ECRf-7qsdX-1XF9aJP-ARcmA9v8UXGiTuAMDqwPyPSirVlSP5us68jhhVsxOH81UMfhmvMIT-RX0WlStYNkcJ"
+                 alt="Family Suite" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
+                <h3 class="text-white font-headline-sm text-headline-sm">Family Suite</h3>
+                <div class="flex justify-between items-center mt-md">
+                    <span class="text-white font-headline-sm text-headline-sm">$329<span class="text-body-sm font-normal">/night</span></span>
+                    <span class="material-symbols-outlined text-white">chevron_right</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Business Suite + USP Card -->
+        <div class="md:col-span-3 md:row-span-1 grid grid-cols-1 md:grid-cols-2 gap-gutter">
+
+            <!-- Business Suite -->
+            <div class="group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest flex transition-all hover:shadow-xl hover:-translate-y-1">
+                <div class="w-1/2 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-5aRgYxwWGkv7k3ovSANc8Ky7cGeQmt64Jf4F4jNPTt3UubsD4vc7Va3nTRyZMthqXsZjTQv5AGESQZPTyqWDcFPmEZjoctEfCdY_J7hYHhGC2M6rNwD3xvIP2lkBLC02w_mjWp0B9enNaDcDHtgvwhuNadDf8-FHpZIoYdf1qdCw79xeaP2jtdWbUmgz14RAY9klDrNIfKbzzbbWbjDZ5bdG-lNZA5RaTzEx0UWfnMVp9GFbPQ5Fz_VQQ5QtKEM6nnH8wEji8nPq"
+                         alt="Business Suite" />
+                </div>
+                <div class="w-1/2 p-lg flex flex-col justify-center">
+                    <h3 class="text-primary font-headline-md text-headline-md">Business Suite</h3>
+                    <p class="text-on-surface-variant font-body-sm text-body-sm mt-xs mb-lg">Productivity meets luxury in our executive wing.</p>
+                    <div class="flex flex-col gap-sm">
+                        <div class="flex items-center gap-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-sm">wifi</span>
+                            <span class="text-label-sm font-label-sm">High Speed WiFi</span>
+                        </div>
+                        <div class="flex items-center gap-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-sm">coffee</span>
+                            <span class="text-label-sm font-label-sm">Premium Espresso</span>
+                        </div>
+                    </div>
+                    <div class="mt-auto flex items-baseline gap-xs">
+                        <span class="text-primary font-headline-md text-headline-md">$199</span>
+                        <span class="text-on-surface-variant text-body-sm">/night</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USP Card -->
+            <div class="bg-primary text-white p-lg rounded-xl flex flex-col justify-between">
+                <div>
+                    <h4 class="font-headline-sm text-headline-sm mb-xs">Why stay at StayWithMeh?</h4>
+                    <p class="font-body-sm text-body-sm opacity-80">We combine the warmth of home with the efficiency of modern management.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="flex flex-col">
+                        <span class="font-headline-md text-headline-md">4.9/5</span>
+                        <span class="text-label-sm font-label-sm opacity-70">Guest Rating</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-headline-md text-headline-md">24/7</span>
+                        <span class="text-label-sm font-label-sm opacity-70">Smart Concierge</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     NEWSLETTER + TRUST SECTION
+═══════════════════════════════════════════════ -->
+<section class="bg-surface-container py-xl">
+    <div class="max-w-[1440px] mx-auto px-lg grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+
+        <!-- Newsletter Card -->
+        <div class="p-xl bg-white rounded-2xl shadow-sm border border-outline-variant">
+            <span class="text-primary font-bold tracking-tighter text-label-md uppercase mb-sm block">Join the inner circle</span>
+            <h2 class="font-headline-lg text-headline-lg text-primary mb-md">Exclusive Offers for Members</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-xl">
+                Subscribe to our newsletter and receive personalized travel tips and priority booking rates for our global destinations.
+            </p>
+            <form asp-controller="Home" asp-action="Subscribe" method="post" class="flex gap-sm">
+                @Html.AntiForgeryToken()
+                <input class="flex-1 bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                       placeholder="Enter your email" type="email" name="email" required />
+                <button type="submit" class="bg-primary text-white px-xl py-sm rounded-lg font-bold hover:bg-primary-container transition-all">Subscribe</button>
+            </form>
+        </div>
+
+        <!-- Trust Items -->
+        <div class="flex flex-col gap-lg">
+            <div class="flex gap-md items-start">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-primary">verified_user</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Trusted by Global Travelers</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Over 50,000 bookings processed with a 99% satisfaction rate across all StayWithMeh locations.</p>
+                </div>
+            </div>
+            <div class="flex gap-md items-start">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-primary">eco</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Sustainable Luxury</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant">We prioritize eco-friendly operations and local sourcing without compromising on your luxury experience.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Search bar input focus ring
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.closest('.group')?.classList.add('ring-2', 'ring-primary', 'z-10');
+            });
+            input.addEventListener('blur', () => {
+                input.closest('.group')?.classList.remove('ring-2', 'ring-primary', 'z-10');
+            });
+        });
+    </script>
+}

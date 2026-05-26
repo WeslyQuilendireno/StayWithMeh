@@ -1,49 +1,188 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html class="light" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - StayWithMeh</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/StayWithMeh.styles.css" asp-append-version="true" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#efedf0",
+                        "on-surface": "#1b1b1e",
+                        "surface-bright": "#fbf8fc",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3f6",
+                        "secondary": "#5d5e61",
+                        "on-surface-variant": "#44474e",
+                        "surface-container-highest": "#e4e2e5",
+                        "secondary-container": "#dfdfe2",
+                        "outline-variant": "#c5c6cf",
+                        "primary-container": "#1a2b4b",
+                        "background": "#fbf8fc",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#75777f",
+                        "primary": "#031635",
+                        "surface-container-high": "#e9e7eb",
+                        "surface": "#fbf8fc"
+                    },
+                    spacing: {
+                        "lg": "24px", "xs": "4px", "gutter": "24px",
+                        "sm": "8px", "md": "16px", "xl": "32px",
+                        "container-max": "1440px"
+                    },
+                    fontSize: {
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">StayWithMeh</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+<body class="bg-background text-on-surface">
+
+<!-- ═══════════════════════════════════════════════
+     TOP NAVIGATION BAR
+═══════════════════════════════════════════════ -->
+<header id="main-header" class="fixed top-0 left-0 w-full z-50 bg-white border-b border-outline-variant h-16 px-10 flex justify-between items-center transition-all duration-300">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-10">
+        <a asp-controller="Home" asp-action="Index" class="text-2xl font-black text-primary tracking-tight">StayWithMeh</a>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - StayWithMeh - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Nav Links -->
+    <nav class="hidden lg:flex items-center gap-6">
+        <a asp-controller="Home" asp-action="Index"
+           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Home" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Home</a>
+        <a asp-controller="Explore" asp-action="Index"
+           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Explore" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Explore</a>
+        <a asp-controller="Booking" asp-action="MyBookings"
+           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Bookings" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Bookings</a>
+        <a asp-controller="Wishlist" asp-action="Index"
+           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Saved" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Saved</a>
+        <a asp-controller="Support" asp-action="Index"
+           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Support" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Support</a>
+    </nav>
+
+    <!-- Search + Actions -->
+    <div class="flex items-center gap-4">
+        <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-1 hover:bg-primary-container transition-colors">
+            <span class="material-symbols-outlined text-lg">add</span> Add Booking
+        </button>
+        <div class="flex items-center gap-3">
+            <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">notifications</button>
+            <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">settings</button>
+            <div class="w-9 h-9 rounded-lg overflow-hidden border border-outline-variant ml-1 cursor-pointer bg-surface-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary">person</span>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE CONTENT
+═══════════════════════════════════════════════ -->
+<main class="pt-16">
+    @RenderBody()
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="bg-primary text-white pt-xl pb-lg px-lg">
+    <div class="max-w-[1440px] mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-xl mb-xl">
+
+            <!-- Brand -->
+            <div class="flex flex-col gap-md">
+                <span class="text-headline-md font-headline-md font-bold">StayWithMeh</span>
+                <p class="font-body-sm text-body-sm opacity-60">The operating system for modern hospitality. Seamless management for hotels, effortless stays for guests.</p>
+                <div class="flex gap-md mt-md">
+                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">language</span>
+                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">share</span>
+                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">public</span>
+                </div>
+            </div>
+
+            <!-- Destinations -->
+            <div class="flex flex-col gap-md">
+                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Destinations</span>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">New York, USA</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">London, UK</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Tokyo, Japan</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Dubai, UAE</a>
+            </div>
+
+            <!-- Company -->
+            <div class="flex flex-col gap-md">
+                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Company</span>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">About Us</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Careers</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Sustainability</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Newsroom</a>
+            </div>
+
+            <!-- Support -->
+            <div class="flex flex-col gap-md">
+                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Support</span>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Help Center</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">My Booking</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Contact Us</a>
+                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Terms of Service</a>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-lg border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-md">
+            <p class="font-label-sm text-label-sm opacity-40">© 2026 StayWithMeh. All rights reserved.</p>
+            <div class="flex gap-lg font-label-sm text-label-sm opacity-40">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Cookie Policy</a>
+                <a href="#">Security</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scroll effect for header -->
+<script>
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('main-header');
+        if (window.scrollY > 50) {
+            header.classList.add('shadow-md', 'bg-white/95', 'backdrop-blur-md');
+        } else {
+            header.classList.remove('shadow-md', 'bg-white/95', 'backdrop-blur-md');
+        }
+    });
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
