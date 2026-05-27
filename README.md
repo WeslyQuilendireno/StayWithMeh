@@ -1,35 +1,35 @@
-# 📋 StayWithMeh — Weekly Sprint Log
+#  StayWithMeh — Weekly Sprint Log
 **Project:** SmartStay Hotel Management System  
 **Developer:** Wesly Quilendireno  
-**Stack:** ASP.NET Core MVC · C# · Supabase · Tailwind CSS · Python (AI Pricing)  
+**Stack:** ASP.NET Core MVC · C# · Supabase · Tailwind CSS · Python   
 **Repository:** https://github.com/WeslyQuilendireno/StayWithMeh 
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 A full-stack web-based Hotel Management System supporting multiple user roles (Guest, Receptionist, Manager, Housekeeper). Built for educational/personal use with a focus on clean architecture, real-time features, and AI-powered room pricing.
 
 ---
 
-## 🗓️ Week 1 — May 24–31, 2026
+## Week 1 — May 24–31, 2026
 
-### 🎯 Sprint Goal
+### Sprint Goal
 Set up the project foundation, design system, database, and implement the Guest Landing Page.
 
 ---
 
-### ✅ Completed Tasks
+### Completed Tasks
 
-#### 📐 System Design & Planning
+#### System Design & Planning
 - Defined system requirements and core actors (Guest, Receptionist, Manager, Housekeeper, System)
 - Designed OOD class diagram with key classes: Hotel, Room, RoomBooking, RoomKey, HouseKeeping, RoomCharge, Invoice
 - Mapped activity diagrams for: Room Booking, Check-in, Cancel Booking, Notifications
 - Planned architecture: C# MVC as main app + Python microservice for AI pricing
 - Chose Supabase as Backend-as-a-Service (BaaS) for PostgreSQL + Realtime
 
-#### 🎨 UI/UX Design
-- Designed full prototype in **Google Stitch** (SmartStay Hotel Management System)
+#### UI/UX Design
+- Designed full prototype in **Google Stitch** (Hotel Management System)
 - Completed designs for 13 screens:
   - Guest Landing Page
   - Explore Destinations & Rooms
@@ -43,7 +43,7 @@ Set up the project foundation, design system, database, and implement the Guest 
   - Customer Support Center
 - Established design system: Navy `#031635` primary, Inter font, Material Symbols icons, Tailwind CSS
 
-#### 🛠️ Development Environment Setup
+#### Development Environment Setup
 - Installed **Visual Studio 2022 Community**
 - Configured workloads:
   - ✅ ASP.NET and web development
@@ -58,7 +58,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 - Created **private GitHub repository**: `WeslyQuilendireno/StayWithMeh`
 - Made initial commit and push
 
-#### 🗄️ Database Setup (Supabase)
+#### Database Setup (Supabase)
 - Created Supabase project: **HotelMS** (Region: Northeast Asia - Tokyo)
 - Created 4 database tables:
 
@@ -73,7 +73,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 - Enabled **Realtime** on all tables
 - Set up Foreign Key relationships: bookings → guests, bookings → rooms, invoices → bookings
 
-#### 💻 Guest Landing Page Implementation
+#### Guest Landing Page Implementation
 - Created `Views/Shared/_Layout.cshtml`:
   - Fixed top navigation bar (StayWithMeh logo, nav links, Add Booking button)
   - Active page highlighting via `ViewData["ActivePage"]`
@@ -95,7 +95,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-### 🐛 Issues Encountered & Fixed
+### Issues Encountered & Fixed
 
 | Issue | Cause | Fix |
 |---|---|---|
@@ -107,7 +107,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-### 📊 Progress Tracker
+###  Progress Tracker
 
 #### Pages
 ```
@@ -147,7 +147,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-### 🎯 Next Sprint Goals (Week 2)
+### Next Sprint Goals (Week 2)
 
 - [ ] Create C# Models (`Room.cs`, `Guest.cs`, `Booking.cs`, `Invoice.cs`)
 - [ ] Update `Program.cs` with Supabase connection
@@ -158,7 +158,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-### 💡 Notes & Decisions
+### Notes & Decisions
 
 - Chose **Tailwind CSS via CDN** for rapid prototyping — will consider build pipeline later
 - Using **User Secrets** locally and **Environment Variables** for deployment
