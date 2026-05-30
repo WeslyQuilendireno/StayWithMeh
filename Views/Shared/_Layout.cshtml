@@ -4,10 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - StayWithMeh</title>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
@@ -26,6 +23,8 @@
                         "on-surface-variant": "#44474e",
                         "surface-container-highest": "#e4e2e5",
                         "secondary-container": "#dfdfe2",
+                        "secondary-fixed": "#e2e2e5",
+                        "on-secondary-fixed": "#1a1c1e",
                         "outline-variant": "#c5c6cf",
                         "primary-container": "#1a2b4b",
                         "background": "#fbf8fc",
@@ -61,108 +60,138 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── Sliding nav underline ── */
+        .nav-slider {
+            position: absolute;
+            bottom: 0;
+            height: 2px;
+            background: #031635;
+            border-radius: 2px;
+            transition: left 0.35s cubic-bezier(.4,0,.2,1),
+                        width 0.35s cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.2s;
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface">
 
-<!-- ═══════════════════════════════════════════════
-     TOP NAVIGATION BAR
-═══════════════════════════════════════════════ -->
-<header id="main-header" class="fixed top-0 left-0 w-full z-50 bg-white border-b border-outline-variant h-16 px-10 flex justify-between items-center transition-all duration-300">
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<header id="main-header"
+        class="fixed top-0 left-0 w-full z-50 bg-white border-b border-outline-variant h-16 transition-all duration-300">
+    <div class="h-full max-w-[1440px] mx-auto px-10 flex justify-between items-center">
 
-    <!-- Logo -->
-    <div class="flex items-center gap-10">
-        <a asp-controller="Home" asp-action="Index" class="text-2xl font-black text-primary tracking-tight">StayWithMeh</a>
-    </div>
-
-    <!-- Nav Links -->
-    <nav class="hidden lg:flex items-center gap-6">
+        <!-- Logo -->
         <a asp-controller="Home" asp-action="Index"
-           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Home" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Home</a>
-        <a asp-controller="Explore" asp-action="Index"
-           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Explore" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Explore</a>
-        <a asp-controller="Booking" asp-action="MyBookings"
-           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Bookings" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Bookings</a>
-        <a asp-controller="Wishlist" asp-action="Index"
-           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Saved" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Saved</a>
-        <a asp-controller="Support" asp-action="Index"
-           class="text-sm font-medium @(ViewData["ActivePage"]?.ToString() == "Support" ? "font-bold text-primary border-b-2 border-primary py-5" : "text-on-surface-variant hover:text-primary transition-colors")">Support</a>
-    </nav>
+           class="text-2xl font-black text-primary tracking-tight shrink-0">StayWithMeh</a>
 
-    <!-- Search + Actions -->
-    <div class="flex items-center gap-4">
-        <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-1 hover:bg-primary-container transition-colors">
-            <span class="material-symbols-outlined text-lg">add</span> Add Booking
-        </button>
-        <div class="flex items-center gap-3">
-            <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">notifications</button>
-            <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">settings</button>
-            <div class="w-9 h-9 rounded-lg overflow-hidden border border-outline-variant ml-1 cursor-pointer bg-surface-container flex items-center justify-center">
-                <span class="material-symbols-outlined text-primary">person</span>
+        <!-- Nav Links with sliding underline -->
+        <nav class="hidden lg:flex items-center gap-6 relative h-full" id="mainNav">
+
+            <!-- The sliding underline bar -->
+            <span class="nav-slider" id="navSlider"></span>
+
+            <a asp-controller="Home" asp-action="Index"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Home" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Home">Home</a>
+
+            <a asp-controller="Explore" asp-action="Index"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Explore" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Explore">Explore</a>
+
+            <a asp-controller="Booking" asp-action="MyBookings"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Bookings" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Bookings">Bookings</a>
+
+            <a href="#"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Rooms" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Rooms">Rooms</a>
+
+            <a href="#"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Analytics" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Analytics">Analytics</a>
+
+            <a href="#"
+               class="nav-link text-sm font-medium h-full flex items-center
+                      @(ViewData["ActivePage"]?.ToString() == "Staff" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Staff">Staff</a>
+        </nav>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-4">
+            <div class="relative hidden xl:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary text-xl">search</span>
+                <input type="text" placeholder="Search bookings..."
+                       class="bg-surface-container border-none rounded-lg pl-10 pr-4 py-2 text-sm w-56 focus:ring-0 placeholder:text-outline" />
+            </div>
+            <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-1 hover:bg-primary-container transition-colors">
+                <span class="material-symbols-outlined text-lg">add</span> Add Booking
+            </button>
+            <div class="flex items-center gap-2">
+                <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">notifications</button>
+                <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">settings</button>
+                <div class="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant flex items-center justify-center ml-1 cursor-pointer">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════
-     PAGE CONTENT
-═══════════════════════════════════════════════ -->
+<!-- Page Content -->
 <main class="pt-16">
     @RenderBody()
 </main>
 
-<!-- ═══════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════ -->
-<footer class="bg-primary text-white pt-xl pb-lg px-lg">
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="bg-primary text-white pt-xl pb-lg px-lg mt-xl">
     <div class="max-w-[1440px] mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-xl mb-xl">
-
-            <!-- Brand -->
             <div class="flex flex-col gap-md">
-                <span class="text-headline-md font-headline-md font-bold">StayWithMeh</span>
-                <p class="font-body-sm text-body-sm opacity-60">The operating system for modern hospitality. Seamless management for hotels, effortless stays for guests.</p>
-                <div class="flex gap-md mt-md">
-                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">language</span>
-                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">share</span>
-                    <span class="material-symbols-outlined cursor-pointer hover:opacity-100 opacity-60">public</span>
+                <span class="text-2xl font-black">StayWithMeh</span>
+                <p class="text-body-sm opacity-60">The operating system for modern hospitality. Seamless management for hotels, effortless stays for guests.</p>
+                <div class="flex gap-md mt-sm">
+                    <span class="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100">language</span>
+                    <span class="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100">share</span>
+                    <span class="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100">public</span>
                 </div>
             </div>
-
-            <!-- Destinations -->
             <div class="flex flex-col gap-md">
-                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Destinations</span>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">New York, USA</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">London, UK</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Tokyo, Japan</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Dubai, UAE</a>
+                <span class="text-label-md font-label-md uppercase tracking-widest opacity-40">Destinations</span>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">New York, USA</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">London, UK</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Tokyo, Japan</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Dubai, UAE</a>
             </div>
-
-            <!-- Company -->
             <div class="flex flex-col gap-md">
-                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Company</span>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">About Us</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Careers</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Sustainability</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Newsroom</a>
+                <span class="text-label-md font-label-md uppercase tracking-widest opacity-40">Company</span>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">About Us</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Careers</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Sustainability</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Newsroom</a>
             </div>
-
-            <!-- Support -->
             <div class="flex flex-col gap-md">
-                <span class="font-label-md text-label-md uppercase tracking-widest opacity-40">Support</span>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Help Center</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">My Booking</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Contact Us</a>
-                <a class="font-body-sm text-body-sm hover:translate-x-1 transition-transform" href="#">Terms of Service</a>
+                <span class="text-label-md font-label-md uppercase tracking-widest opacity-40">Support</span>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Help Center</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">My Booking</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Contact Us</a>
+                <a class="text-body-sm hover:translate-x-1 transition-transform" href="#">Terms of Service</a>
             </div>
         </div>
-
-        <!-- Bottom Bar -->
         <div class="pt-lg border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-md">
-            <p class="font-label-sm text-label-sm opacity-40">© 2026 StayWithMeh. All rights reserved.</p>
-            <div class="flex gap-lg font-label-sm text-label-sm opacity-40">
+            <p class="text-label-sm opacity-40">© 2026 StayWithMeh. All rights reserved.</p>
+            <div class="flex gap-lg text-label-sm opacity-40">
                 <a href="#">Privacy Policy</a>
                 <a href="#">Cookie Policy</a>
                 <a href="#">Security</a>
@@ -171,16 +200,58 @@
     </div>
 </footer>
 
-<!-- Scroll effect for header -->
 <script>
+    // ── Header scroll shadow ──
     window.addEventListener('scroll', () => {
-        const header = document.getElementById('main-header');
-        if (window.scrollY > 50) {
-            header.classList.add('shadow-md', 'bg-white/95', 'backdrop-blur-md');
-        } else {
-            header.classList.remove('shadow-md', 'bg-white/95', 'backdrop-blur-md');
-        }
+        const h = document.getElementById('main-header');
+        window.scrollY > 50
+            ? h.classList.add('shadow-md')
+            : h.classList.remove('shadow-md');
     });
+
+    // ── Sliding nav underline ──
+    (function () {
+        const nav    = document.getElementById('mainNav');
+        const slider = document.getElementById('navSlider');
+        if (!nav || !slider) return;
+
+        // Find the currently active link
+        const activePage = "@ViewData["ActivePage"]";
+        const links = nav.querySelectorAll('.nav-link');
+
+        function moveSliderTo(el) {
+            const navRect  = nav.getBoundingClientRect();
+            const linkRect = el.getBoundingClientRect();
+            slider.style.left  = (linkRect.left - navRect.left) + 'px';
+            slider.style.width = linkRect.width + 'px';
+        }
+
+        // Set initial position on active link (no transition on load)
+        links.forEach(link => {
+            if (link.dataset.nav === activePage) {
+                slider.style.transition = 'none';
+                moveSliderTo(link);
+                // Re-enable transition after paint
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        slider.style.transition = '';
+                    });
+                });
+            }
+        });
+
+        // Hover: slide to hovered link
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => moveSliderTo(link));
+        });
+
+        // Mouse leave nav: return to active link
+        nav.addEventListener('mouseleave', () => {
+            links.forEach(link => {
+                if (link.dataset.nav === activePage) moveSliderTo(link);
+            });
+        });
+    })();
 </script>
 
 @await RenderSectionAsync("Scripts", required: false)
