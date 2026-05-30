@@ -10,7 +10,6 @@
 <section class="mt-lg px-gutter max-w-[1440px] mx-auto">
     <form asp-controller="Explore" asp-action="Index" method="get">
 
-        <!-- Main search pill -->
         <div class="bg-surface-container-lowest rounded-full shadow-md border border-outline-variant p-2
                     flex flex-col lg:flex-row items-stretch gap-xs">
 
@@ -92,7 +91,7 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     POPULAR DESTINATIONS  (your own photos)
+     POPULAR DESTINATIONS — Rectangle Cards
 ═══════════════════════════════════════════════ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex justify-between items-end mb-lg">
@@ -114,75 +113,76 @@
         </div>
     </div>
 
-    <div id="destinationScroll" class="flex gap-md overflow-x-auto no-scrollbar pb-4">
+    <!-- Rectangle destination cards with generous gap -->
+    <div id="destinationScroll" class="flex gap-8 overflow-x-auto no-scrollbar pb-6">
 
         @* ── New York ── *@
-        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
-            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
+            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
-                            transition-transform duration-500 group-hover:scale-110"
+                            transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/newyorkUS.jpg" alt="New York" />
-                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
-                            flex flex-col justify-end p-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">New York</h3>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United States</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United States</p>
                 </div>
             </div>
-            <div class="flex justify-between items-center px-2">
+            <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">1,240 Properties</span>
                 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </div>
         </div>
 
         @* ── London ── *@
-        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
-            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
+            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
-                            transition-transform duration-500 group-hover:scale-110"
+                            transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/londonUK.jpg" alt="London" />
-                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
-                            flex flex-col justify-end p-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">London</h3>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United Kingdom</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Kingdom</p>
                 </div>
             </div>
-            <div class="flex justify-between items-center px-2">
+            <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">890 Properties</span>
                 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </div>
         </div>
 
         @* ── Tokyo ── *@
-        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
-            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
+            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
-                            transition-transform duration-500 group-hover:scale-110"
+                            transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/tokyoJP.jpg" alt="Tokyo" />
-                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
-                            flex flex-col justify-end p-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">Tokyo</h3>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">Japan</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Japan</p>
                 </div>
             </div>
-            <div class="flex justify-between items-center px-2">
+            <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">2,150 Properties</span>
                 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </div>
         </div>
 
         @* ── Dubai ── *@
-        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
-            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
+            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
-                            transition-transform duration-500 group-hover:scale-110"
+                            transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/dubaiUAE.jpg" alt="Dubai" />
-                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
-                            flex flex-col justify-end p-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">Dubai</h3>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United Arab Emirates</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Arab Emirates</p>
                 </div>
             </div>
-            <div class="flex justify-between items-center px-2">
+            <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">1,020 Properties</span>
                 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </div>
@@ -192,7 +192,7 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     AVAILABLE ROOMS
+     AVAILABLE ROOMS — with your own photos
 ═══════════════════════════════════════════════ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
@@ -221,13 +221,13 @@
 
     <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
 
-        <!-- Skyline Executive Suite -->
+        <!-- ── Skyline Executive Suite ── -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
             <div class="relative h-64 overflow-hidden">
                 <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/SkylineExecutiveSuite.png" alt="Skyline Executive Suite"
-                     onerror="this.src='~/images/guest_landing_page_image/DeluxeSuite.png'" />
+                     src="~/images/explore_page/AvailableRooms_SkylineExecutiveSuite.png"
+                     alt="Skyline Executive Suite" />
                 <div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 rounded-full
                             text-[10px] font-bold uppercase tracking-wider">Premium</div>
                 <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full
@@ -281,13 +281,13 @@
             </div>
         </div>
 
-        <!-- Urban Deluxe King -->
+        <!-- ── Urban Deluxe King ── -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
             <div class="relative h-64 overflow-hidden">
                 <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/UrbanDeluxeKing.png" alt="Urban Deluxe King"
-                     onerror="this.src='~/images/guest_landing_page_image/BusinessSuite.png'" />
+                     src="~/images/explore_page/AvailableRooms_UrbanDeluxeKing.png"
+                     alt="Urban Deluxe King" />
                 <div class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full
                             text-[10px] font-bold uppercase tracking-wider">Business Choice</div>
                 <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full
@@ -337,13 +337,13 @@
             </div>
         </div>
 
-        <!-- Grand Family Loft — Fully Booked -->
+        <!-- ── Grand Family Loft — Fully Booked ── -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md transition-all">
             <div class="relative h-64 overflow-hidden">
                 <img class="w-full h-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/GrandFamilyLoft.png" alt="Grand Family Loft"
-                     onerror="this.src='~/images/guest_landing_page_image/FamilySuite.png'" />
+                     src="~/images/explore_page/AvailableRooms_GrandFamilyLoft.png"
+                     alt="Grand Family Loft" />
                 <div class="absolute top-4 left-4 bg-outline text-surface px-3 py-1 rounded-full
                             text-[10px] font-bold uppercase tracking-wider">Family</div>
                 <div class="absolute top-4 right-4 bg-red-100 text-red-800 px-3 py-1 rounded-full
@@ -474,17 +474,14 @@
 
 @section Scripts {
 <script>
-    // Price range
     const pr = document.getElementById('priceRange');
     const pd = document.getElementById('priceDisplay');
     pr?.addEventListener('input', () => pd.textContent = '$' + pr.value);
 
-    // Destination scroll
     const sc = document.getElementById('destinationScroll');
-    document.getElementById('scrollLeft')?.addEventListener('click',  () => sc.scrollBy({ left: -300, behavior: 'smooth' }));
-    document.getElementById('scrollRight')?.addEventListener('click', () => sc.scrollBy({ left:  300, behavior: 'smooth' }));
+    document.getElementById('scrollLeft')?.addEventListener('click',  () => sc.scrollBy({ left: -340, behavior: 'smooth' }));
+    document.getElementById('scrollRight')?.addEventListener('click', () => sc.scrollBy({ left:  340, behavior: 'smooth' }));
 
-    // Grid / List toggle
     document.getElementById('gridBtn')?.addEventListener('click', () => {
         document.getElementById('roomsGrid').className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg';
     });
