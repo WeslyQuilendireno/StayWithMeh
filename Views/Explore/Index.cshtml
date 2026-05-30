@@ -1,0 +1,495 @@
+@{
+    ViewData["Title"]      = "Explore Destinations & Rooms";
+    ViewData["ActivePage"] = "Explore";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- ═══════════════════════════════════════════════
+     SEARCH BAR
+═══════════════════════════════════════════════ -->
+<section class="mt-lg px-gutter max-w-[1440px] mx-auto">
+    <form asp-controller="Explore" asp-action="Index" method="get">
+
+        <!-- Main search pill -->
+        <div class="bg-surface-container-lowest rounded-full shadow-md border border-outline-variant p-2
+                    flex flex-col lg:flex-row items-stretch gap-xs">
+
+            <!-- Destination -->
+            <div class="flex-1 flex items-center px-4 py-3 gap-3
+                        border-b lg:border-b-0 lg:border-r border-outline-variant">
+                <span class="material-symbols-outlined text-primary">location_on</span>
+                <div class="flex flex-col w-full">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-outline">Destination</span>
+                    <input class="border-none p-0 focus:ring-0 text-body-md w-full bg-transparent placeholder-on-surface-variant"
+                           placeholder="Enter city, area or property name"
+                           type="text" name="destination" value="@ViewData["Destination"]" />
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="flex-1 flex items-center px-4 py-3 gap-3
+                        border-b lg:border-b-0 lg:border-r border-outline-variant">
+                <span class="material-symbols-outlined text-primary">calendar_month</span>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-outline">Check-in</span>
+                    <input type="date" name="checkIn" value="@ViewData["CheckIn"]"
+                           class="border-none p-0 focus:ring-0 text-body-md font-medium bg-transparent" />
+                </div>
+                <span class="mx-2 text-outline">|</span>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-outline">Check-out</span>
+                    <input type="date" name="checkOut" value="@ViewData["CheckOut"]"
+                           class="border-none p-0 focus:ring-0 text-body-md font-medium bg-transparent" />
+                </div>
+            </div>
+
+            <!-- Guests -->
+            <div class="flex-1 flex items-center px-4 py-3 gap-3">
+                <span class="material-symbols-outlined text-primary">group</span>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-outline">Rooms &amp; Guests</span>
+                    <span class="text-body-md font-medium">1 Room, 2 Guests</span>
+                </div>
+            </div>
+
+            <!-- Search btn -->
+            <button type="submit"
+                    class="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-sm
+                           flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                Search <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+
+        <!-- Filter row -->
+        <div class="mt-md flex flex-wrap items-center gap-md">
+            <div class="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5 border border-outline-variant">
+                <span class="text-label-sm text-on-surface-variant uppercase">Type:</span>
+                <select name="type" class="bg-transparent border-none text-label-md p-0 pr-6 focus:ring-0">
+                    <option>All Types</option>
+                    <option>Standard</option>
+                    <option>Deluxe</option>
+                    <option>Business Suite</option>
+                    <option>Family Suite</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5 border border-outline-variant">
+                <span class="text-label-sm text-on-surface-variant uppercase">Price:</span>
+                <input id="priceRange" class="w-32 accent-primary" type="range" min="50" max="1000" value="500" />
+                <span id="priceDisplay" class="text-label-sm text-primary font-bold">$500</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" name="wifi" />
+                    <span class="text-label-md">WiFi</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" name="pool" />
+                    <span class="text-label-md">Pool</span>
+                </label>
+            </div>
+        </div>
+    </form>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     POPULAR DESTINATIONS  (your own photos)
+═══════════════════════════════════════════════ -->
+<section class="mt-xl px-gutter max-w-[1440px] mx-auto">
+    <div class="flex justify-between items-end mb-lg">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-primary">Popular Destinations</h2>
+            <p class="text-on-surface-variant font-body-sm mt-xs">Curated trips based on your preferences</p>
+        </div>
+        <div class="flex gap-2">
+            <button id="scrollLeft"
+                    class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center
+                           hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button id="scrollRight"
+                    class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center
+                           hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="destinationScroll" class="flex gap-md overflow-x-auto no-scrollbar pb-4">
+
+        @* ── New York ── *@
+        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
+            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-110"
+                     src="~/images/explore_page/newyorkUS.jpg" alt="New York" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
+                            flex flex-col justify-end p-lg">
+                    <h3 class="text-white font-headline-md text-headline-md">New York</h3>
+                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United States</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-2">
+                <span class="text-label-md font-semibold text-on-surface">1,240 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        @* ── London ── *@
+        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
+            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-110"
+                     src="~/images/explore_page/londonUK.jpg" alt="London" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
+                            flex flex-col justify-end p-lg">
+                    <h3 class="text-white font-headline-md text-headline-md">London</h3>
+                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United Kingdom</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-2">
+                <span class="text-label-md font-semibold text-on-surface">890 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        @* ── Tokyo ── *@
+        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
+            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-110"
+                     src="~/images/explore_page/tokyoJP.jpg" alt="Tokyo" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
+                            flex flex-col justify-end p-lg">
+                    <h3 class="text-white font-headline-md text-headline-md">Tokyo</h3>
+                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">Japan</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-2">
+                <span class="text-label-md font-semibold text-on-surface">2,150 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        @* ── Dubai ── *@
+        <div class="min-w-[260px] max-w-[260px] group cursor-pointer flex-shrink-0">
+            <div class="relative h-[380px] rounded-[120px] overflow-hidden mb-4">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-110"
+                     src="~/images/explore_page/dubaiUAE.jpg" alt="Dubai" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent
+                            flex flex-col justify-end p-lg">
+                    <h3 class="text-white font-headline-md text-headline-md">Dubai</h3>
+                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">United Arab Emirates</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-2">
+                <span class="text-label-md font-semibold text-on-surface">1,020 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     AVAILABLE ROOMS
+═══════════════════════════════════════════════ -->
+<section class="mt-xl px-gutter max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
+        <h2 class="font-headline-lg text-headline-lg text-primary">Available Rooms</h2>
+        <div class="flex items-center gap-4 w-full md:w-auto">
+            <div class="relative flex-1 md:w-56">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">sort</span>
+                <select class="w-full pl-10 pr-4 py-2.5 bg-surface-container rounded-xl
+                               border border-outline-variant font-label-md focus:ring-primary">
+                    <option>Recommended</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Top Rated</option>
+                </select>
+            </div>
+            <div class="flex border border-outline-variant rounded-xl overflow-hidden shrink-0">
+                <button id="gridBtn" class="p-2.5 bg-primary text-on-primary">
+                    <span class="material-symbols-outlined">grid_view</span>
+                </button>
+                <button id="listBtn" class="p-2.5 bg-surface text-on-surface hover:bg-surface-container">
+                    <span class="material-symbols-outlined">view_list</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+
+        <!-- Skyline Executive Suite -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
+                    overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
+            <div class="relative h-64 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                     src="~/images/explore_page/SkylineExecutiveSuite.png" alt="Skyline Executive Suite"
+                     onerror="this.src='~/images/guest_landing_page_image/DeluxeSuite.png'" />
+                <div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 rounded-full
+                            text-[10px] font-bold uppercase tracking-wider">Premium</div>
+                <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full
+                            text-label-sm font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
+                </div>
+            </div>
+            <div class="p-lg flex-1 flex flex-col">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Skyline Executive Suite</h3>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[18px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-md">4.9</span>
+                    </div>
+                </div>
+                <p class="text-on-surface-variant font-body-sm mb-lg">
+                    Spacious corner suite with floor-to-ceiling windows overlooking the financial district.
+                </p>
+                <div class="flex gap-md mb-lg flex-wrap">
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">wifi</span>
+                        <span class="text-label-sm">Free WiFi</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">ac_unit</span>
+                        <span class="text-label-sm">Full AC</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">tv</span>
+                        <span class="text-label-sm">Smart TV</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
+                    <div>
+                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
+                        <div class="flex items-center gap-2">
+                            <span class="font-headline-md text-headline-md text-primary">$320</span>
+                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-medium">AI Priced</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="p-2.5 rounded-full border border-outline-variant hover:bg-surface-container transition-colors">
+                            <span class="material-symbols-outlined">info</span>
+                        </button>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="1"
+                           class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md
+                                  hover:bg-primary-container transition-colors">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Urban Deluxe King -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
+                    overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
+            <div class="relative h-64 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                     src="~/images/explore_page/UrbanDeluxeKing.png" alt="Urban Deluxe King"
+                     onerror="this.src='~/images/guest_landing_page_image/BusinessSuite.png'" />
+                <div class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full
+                            text-[10px] font-bold uppercase tracking-wider">Business Choice</div>
+                <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full
+                            text-label-sm font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Available
+                </div>
+            </div>
+            <div class="p-lg flex-1 flex flex-col">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Urban Deluxe King</h3>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[18px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-md">4.7</span>
+                    </div>
+                </div>
+                <p class="text-on-surface-variant font-body-sm mb-lg">
+                    A refined space designed for the modern professional with an ergonomic workspace.
+                </p>
+                <div class="flex gap-md mb-lg flex-wrap">
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">laptop_mac</span>
+                        <span class="text-label-sm">Workstation</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">coffee</span>
+                        <span class="text-label-sm">Espresso</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
+                    <div>
+                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
+                        <div class="flex items-center gap-2">
+                            <span class="font-headline-md text-headline-md text-primary">$215</span>
+                            <span class="text-[10px] text-on-surface-variant italic">Reflects season</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="p-2.5 rounded-full border border-outline-variant hover:bg-surface-container transition-colors">
+                            <span class="material-symbols-outlined">info</span>
+                        </button>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="2"
+                           class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md
+                                  hover:bg-primary-container transition-colors">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grand Family Loft — Fully Booked -->
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
+                    overflow-hidden flex flex-col group hover:shadow-md transition-all">
+            <div class="relative h-64 overflow-hidden">
+                <img class="w-full h-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
+                     src="~/images/explore_page/GrandFamilyLoft.png" alt="Grand Family Loft"
+                     onerror="this.src='~/images/guest_landing_page_image/FamilySuite.png'" />
+                <div class="absolute top-4 left-4 bg-outline text-surface px-3 py-1 rounded-full
+                            text-[10px] font-bold uppercase tracking-wider">Family</div>
+                <div class="absolute top-4 right-4 bg-red-100 text-red-800 px-3 py-1 rounded-full
+                            text-label-sm font-bold">Fully Booked</div>
+            </div>
+            <div class="p-lg flex-1 flex flex-col opacity-80">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Grand Family Loft</h3>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[18px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-md">4.5</span>
+                    </div>
+                </div>
+                <p class="text-on-surface-variant font-body-sm mb-lg">
+                    Dual-level loft with separate sleeping areas and child-friendly amenities.
+                </p>
+                <div class="flex gap-md mb-lg flex-wrap">
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">family_restroom</span>
+                        <span class="text-label-sm">4 Guests</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-sm">kitchen</span>
+                        <span class="text-label-sm">Kitchenette</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
+                    <div>
+                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
+                        <span class="font-headline-md text-headline-md text-primary">$450</span>
+                    </div>
+                    <button class="bg-surface-container text-outline px-6 py-2.5 rounded-full
+                                   font-label-md cursor-not-allowed">Join Waitlist</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     FLASH OFFER + OPERATIONAL STANDARDS
+═══════════════════════════════════════════════ -->
+<section class="mt-xl px-gutter max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-lg">
+
+    <div class="bg-primary-container p-xl rounded-3xl relative overflow-hidden">
+        <div class="relative z-10">
+            <span class="bg-white/20 text-white px-3 py-1 rounded-full text-[10px] font-bold
+                         uppercase tracking-widest mb-4 inline-block">Flash Offer</span>
+            <h2 class="font-headline-lg text-headline-lg text-white mb-4">Business Trip? Save 25%</h2>
+            <p class="font-body-md text-white/90 mb-lg max-w-md">
+                Unlock exclusive corporate rates and flexible cancellation policies for all midweek bookings in Q2.
+            </p>
+            <button class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform">
+                Get Partner Code
+            </button>
+        </div>
+        <span class="material-symbols-outlined absolute -bottom-10 -right-10 text-[200px] opacity-10 rotate-12 text-white">
+            corporate_fare
+        </span>
+    </div>
+
+    <div class="bg-surface-container p-xl rounded-3xl border border-outline-variant/30">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-lg">Operational Standards</h2>
+        <div class="grid grid-cols-2 gap-md">
+            <div class="flex items-start gap-3 p-4 bg-surface rounded-2xl">
+                <span class="material-symbols-outlined text-primary bg-blue-50 p-2 rounded-lg">pool</span>
+                <div>
+                    <p class="font-bold text-label-md">Infinity Pool</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase">Temperature Controlled</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4 bg-surface rounded-2xl">
+                <span class="material-symbols-outlined text-primary bg-blue-50 p-2 rounded-lg">fitness_center</span>
+                <div>
+                    <p class="font-bold text-label-md">24/7 Gym</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase">TechnoGym Equipt</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4 bg-surface rounded-2xl">
+                <span class="material-symbols-outlined text-primary bg-blue-50 p-2 rounded-lg">restaurant</span>
+                <div>
+                    <p class="font-bold text-label-md">Gourmet Dining</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase">Michelin Rated</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3 p-4 bg-surface rounded-2xl">
+                <span class="material-symbols-outlined text-primary bg-blue-50 p-2 rounded-lg">local_laundry_service</span>
+                <div>
+                    <p class="font-bold text-label-md">Express Valet</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase">Same Day Return</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Bar -->
+<section class="px-gutter max-w-[1440px] mx-auto my-xl">
+    <div class="bg-surface-container-high p-lg rounded-2xl flex flex-col md:flex-row
+                items-center justify-between gap-lg">
+        <div class="flex items-center gap-md">
+            <div class="flex -space-x-3">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold border-2 border-surface">WQ</div>
+                <div class="w-12 h-12 rounded-full bg-primary-container text-white flex items-center justify-center font-bold border-2 border-surface">JD</div>
+                <div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center font-bold border-2 border-surface">SM</div>
+                <div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center text-[12px] font-bold border-2 border-surface">+12k</div>
+            </div>
+            <div>
+                <p class="font-bold text-headline-sm text-primary">Trusted by over 50,000 travelers</p>
+                <p class="text-on-surface-variant font-body-sm">Consistent 4.8/5 rating across all global platforms.</p>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <div class="text-center">
+                <p class="font-bold text-primary text-headline-md">98%</p>
+                <p class="text-[10px] uppercase font-bold text-outline">Satisfaction</p>
+            </div>
+            <div class="w-px h-10 bg-outline-variant"></div>
+            <div class="text-center">
+                <p class="font-bold text-primary text-headline-md">24/7</p>
+                <p class="text-[10px] uppercase font-bold text-outline">Support</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Price range
+    const pr = document.getElementById('priceRange');
+    const pd = document.getElementById('priceDisplay');
+    pr?.addEventListener('input', () => pd.textContent = '$' + pr.value);
+
+    // Destination scroll
+    const sc = document.getElementById('destinationScroll');
+    document.getElementById('scrollLeft')?.addEventListener('click',  () => sc.scrollBy({ left: -300, behavior: 'smooth' }));
+    document.getElementById('scrollRight')?.addEventListener('click', () => sc.scrollBy({ left:  300, behavior: 'smooth' }));
+
+    // Grid / List toggle
+    document.getElementById('gridBtn')?.addEventListener('click', () => {
+        document.getElementById('roomsGrid').className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg';
+    });
+    document.getElementById('listBtn')?.addEventListener('click', () => {
+        document.getElementById('roomsGrid').className = 'grid grid-cols-1 gap-lg';
+    });
+</script>
+}
