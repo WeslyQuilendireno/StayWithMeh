@@ -168,5 +168,5 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-*Last updated: May 27, 2026*  
+*Last updated: May 31, 2026*  
 *Next update: End of Week 2*
