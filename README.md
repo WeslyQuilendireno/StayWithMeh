@@ -15,7 +15,7 @@ A full-stack web-based Hotel Management System supporting multiple user roles (G
 ## Week 1 — May 24–31, 2026
 
 ### Sprint Goal
-Set up the project foundation, design system, database, and implement the Guest Landing Page.
+Set up the project foundation, design system, database, and implement the Guest Landing Page(Home,Explore,Bookings,Room,Saved,Support(unfinished)).
 
 ---
 
@@ -37,7 +37,6 @@ Set up the project foundation, design system, database, and implement the Guest 
   - Room Details & Booking
   - Saved Rooms Wishlist
   - Bookings Dashboard
-  - Rooms Dashboard (Kanban + Sidebar variants)
   - Rooms Management Dashboard
   - Manager Analytics Dashboard
   - Customer Support Center
@@ -112,10 +111,10 @@ Set up the project foundation, design system, database, and implement the Guest 
 #### Pages
 ```
 ✅ Guest Landing Page
-⬜ Explore Destinations & Rooms
-⬜ My Bookings
-⬜ Room Details & Booking
-⬜ Saved Rooms Wishlist
+✅ Explore Destinations & Rooms
+✅ My Bookings
+✅ Room Details & Booking
+✅ Saved Rooms Wishlist
 ⬜ Customer Support Center
 ⬜ Receptionist/Bookings Dashboard
 ⬜ Rooms Dashboard (Kanban)
@@ -142,19 +141,15 @@ Set up the project foundation, design system, database, and implement the Guest 
 ✅ GitHub private repo created
 ✅ .gitignore protecting secrets
 ✅ User Secrets for API keys
-⬜ Deployment setup
+⬜ Deployment setup (Render)
 ```
 
 ---
 
 ### Next Sprint Goals (Week 2)
 
-- [ ] Create C# Models (`Room.cs`, `Guest.cs`, `Booking.cs`, `Invoice.cs`)
-- [ ] Update `Program.cs` with Supabase connection
-- [ ] Build **Explore Destinations & Rooms** page
-- [ ] Build **Room Details & Booking** page
-- [ ] Connect rooms data from Supabase to Explore page
-- [ ] Begin **My Bookings** page
+- Customer Support Page
+- Function for each guest page 
 
 ---
 
