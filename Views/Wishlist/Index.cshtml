@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"]      = "Saved Rooms";
+    ViewData["ActivePage"] = "Saved";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-[1440px] mx-auto px-gutter py-xl min-h-[70vh]">
+
+    <!-- ═══ PAGE HEADER ═══ -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-xl">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-primary">Saved Rooms</h1>
+            <p class="text-on-surface-variant font-body-sm mt-xs" id="itemCount">0 Items</p>
+        </div>
+        <div class="flex gap-sm" id="headerActions" style="display:none !important">
+            <button onclick="shareCollection()"
+                    class="flex items-center gap-xs border border-outline-variant text-on-surface
+                           px-lg py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">share</span>
+                Share Collection
+            </button>
+            <a asp-controller="Booking" asp-action="MyBookings"
+               class="flex items-center gap-xs bg-primary text-on-primary px-lg py-sm rounded-xl
+                      font-label-md hover:bg-primary-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Add Booking
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ SAVED ROOMS GRID ═══ -->
+    <div id="savedGrid"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg mb-xl"
+         style="display:none">
+        <!-- Cards injected by JS -->
+    </div>
+
+    <!-- ═══ EMPTY STATE ═══ -->
+    <div id="emptyState" class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-24 h-24 bg-surface-container rounded-2xl flex items-center justify-center mb-lg shadow-sm">
+            <span class="material-symbols-outlined text-[48px] text-outline">favorite</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-primary mb-sm">No saved places yet</h2>
+        <p class="text-on-surface-variant font-body-md max-w-sm mb-xl">
+            Start exploring our curated selection of suites and rooms
+            to build your dream collection for your next stay.
+        </p>
+        <a asp-controller="Explore" asp-action="Index"
+           class="flex items-center gap-xs bg-primary text-on-primary px-xl py-md rounded-xl
+                  font-label-md text-label-md hover:bg-primary-container transition-colors">
+            <span class="material-symbols-outlined">explore</span>
+            Explore Rooms
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // ── Saved rooms data (stored in sessionStorage for now) ──
+    const STORAGE_KEY = 'swm_saved_rooms';
+
+    // Sample saved rooms — replace with real Supabase data later
+    const SAVED_ROOMS = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]');
+
+    function getSavedRooms() {
+        return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function removeRoom(id) {
+        let rooms = getSavedRooms();
+        rooms = rooms.filter(r => r.id !== id);
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(rooms));
+        renderSaved();
+    }
+
+    function renderCard(room) {
+        return `
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
+            <div class="relative h-56 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="${room.image}" alt="${room.name}" />
+                <!-- Remove from saved -->
+                <button onclick="removeRoom('${room.id}')"
+                        class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full shadow-sm
+                               flex items-center justify-center hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-red-500 text-[22px]"
+                          style="font-variation-settings:'FILL' 1">favorite</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-xs">${room.name}</h3>
+                <div class="flex items-center gap-xs text-on-surface-variant mb-lg">
+                    <span class="material-symbols-outlined text-[16px]">location_on</span>
+                    <span class="font-body-sm text-body-sm">${room.floor}</span>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <span class="font-headline-sm text-headline-sm text-primary">
+                            $${room.price.toFixed(2)}
+                        </span>
+                        <span class="text-on-surface-variant text-body-sm"> / night</span>
+                    </div>
+                    <div class="flex flex-col gap-xs items-end">
+                        <a href="/Room/Details/${room.id}"
+                           class="bg-primary text-on-primary px-lg py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors w-full text-center">
+                            Book Now
+                        </a>
+                        <a href="/Room/Details/${room.id}"
+                           class="text-primary font-label-sm underline hover:opacity-70 transition-opacity">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function renderSaved() {
+        const rooms  = getSavedRooms();
+        const grid   = document.getElementById('savedGrid');
+        const empty  = document.getElementById('emptyState');
+        const count  = document.getElementById('itemCount');
+        const header = document.getElementById('headerActions');
+
+        count.textContent = `${rooms.length} Item${rooms.length !== 1 ? 's' : ''}`;
+
+        if (rooms.length === 0) {
+            grid.style.display   = 'none';
+            empty.style.display  = 'flex';
+            header.style.display = 'none !important';
+        } else {
+            grid.style.display   = 'grid';
+            empty.style.display  = 'none';
+            header.style.removeProperty('display');
+            header.style.display = 'flex';
+            grid.innerHTML = rooms.map(renderCard).join('');
+        }
+    }
+
+    function shareCollection() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'My Saved Rooms — StayWithMeh',
+                text: 'Check out my saved rooms!',
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => alert('Link copied to clipboard!'));
+        }
+    }
+
+    // ── Initialize ──
+    renderSaved();
+</script>
+}
