@@ -1,0 +1,563 @@
+@{
+    ViewData["Title"]      = "Browse Rooms";
+    ViewData["ActivePage"] = "Rooms";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-[1440px] mx-auto px-gutter py-xl">
+
+    <!-- ═══ PAGE HEADER ═══ -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-primary">Browse Rooms</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-xs">
+                Find the perfect room for your stay
+            </p>
+        </div>
+        <!-- Search -->
+        <div class="relative w-full md:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+            <input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant
+                          rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-body-sm"
+                   placeholder="Search rooms..." type="text" id="searchInput" />
+        </div>
+    </div>
+
+    <!-- ═══ FILTER TABS ═══ -->
+    <div class="border-b border-outline-variant mb-xl overflow-x-auto hide-scrollbar">
+        <div class="flex min-w-max">
+            <button onclick="filterRooms('All Rooms', this)"
+                    class="room-tab py-4 px-lg font-label-md text-label-md text-primary
+                           border-b-2 border-primary -mb-px transition-colors">
+                All Rooms
+            </button>
+            <button onclick="filterRooms('Available', this)"
+                    class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
+                           border-b-2 border-transparent -mb-px hover:text-primary transition-colors">
+                Available
+            </button>
+            <button onclick="filterRooms('Suite', this)"
+                    class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
+                           border-b-2 border-transparent -mb-px hover:text-primary transition-colors">
+                Suites
+            </button>
+            <button onclick="filterRooms('Standard', this)"
+                    class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
+                           border-b-2 border-transparent -mb-px hover:text-primary transition-colors">
+                Standard
+            </button>
+            <button onclick="filterRooms('Family', this)"
+                    class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
+                           border-b-2 border-transparent -mb-px hover:text-primary transition-colors">
+                Family
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ ROOM GRID ═══ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg" id="roomGrid">
+
+        <!-- ── Skyline Executive Suite ── -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
+             data-type="Suite" data-status="Available">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/SkylineExecutiveSuiteRoom.png"
+                     alt="Skyline Executive Suite" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm
+                                 text-label-sm flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        Available
+                    </span>
+                </div>
+                <!-- Save button -->
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 402, 4th Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.9</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Skyline Executive Suite</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">king_bed</span>
+                        <span class="text-body-sm">King Bed</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">wifi</span>
+                        <span class="text-body-sm">WiFi</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">balcony</span>
+                        <span class="text-body-sm">Balcony</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">location_city</span>
+                        <span class="text-body-sm">City View</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <div class="flex items-center gap-2">
+                            <span class="font-headline-sm text-headline-sm text-primary">$450.00</span>
+                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed
+                                         px-2 py-0.5 rounded font-medium">AI Priced</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-sm">
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="1"
+                           class="border border-outline-variant text-primary px-md py-sm rounded-xl
+                                  font-label-md hover:bg-surface-container transition-colors text-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="1"
+                           class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors text-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Superior Twin Room ── -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
+             data-type="Standard" data-status="Available">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/SuperiorTwinRoom.png"
+                     alt="Superior Twin Room" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm
+                                 text-label-sm flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Available
+                    </span>
+                </div>
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 215, 2nd Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.6</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Superior Twin Room</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">bed</span>
+                        <span class="text-body-sm">Twin Beds</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">ac_unit</span>
+                        <span class="text-body-sm">AC</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">coffee_maker</span>
+                        <span class="text-body-sm">Coffee</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <span class="font-headline-sm text-headline-sm text-primary">$210.00</span>
+                    </div>
+                    <div class="flex gap-sm">
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="2"
+                           class="border border-outline-variant text-primary px-md py-sm rounded-xl
+                                  font-label-md hover:bg-surface-container transition-colors text-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="2"
+                           class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors text-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Deluxe Ocean View ── (Unavailable) -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg transition-all group"
+             data-type="Suite" data-status="Unavailable">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/DeluxeOceanViewRoom.png"
+                     alt="Deluxe Ocean View" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-label-sm text-label-sm">
+                        Unavailable
+                    </span>
+                </div>
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow opacity-80">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 601, 6th Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.8</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Deluxe Ocean View</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">king_bed</span>
+                        <span class="text-body-sm">King Bed</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">waves</span>
+                        <span class="text-body-sm">Ocean View</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">balcony</span>
+                        <span class="text-body-sm">Balcony</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <span class="font-headline-sm text-headline-sm text-primary">$325.00</span>
+                    </div>
+                    <button class="bg-surface-container text-outline px-lg py-sm rounded-xl
+                                   font-label-md cursor-not-allowed text-sm">
+                        Join Waitlist
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Standard King Room ── -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
+             data-type="Standard" data-status="Available">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/StandardKingRoom.png"
+                     alt="Standard King Room" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm
+                                 text-label-sm flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Available
+                    </span>
+                </div>
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 304, 3rd Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.4</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Standard King Room</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">king_bed</span>
+                        <span class="text-body-sm">King Bed</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">tv</span>
+                        <span class="text-body-sm">Smart TV</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">wifi</span>
+                        <span class="text-body-sm">WiFi</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <span class="font-headline-sm text-headline-sm text-primary">$180.00</span>
+                    </div>
+                    <div class="flex gap-sm">
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="4"
+                           class="border border-outline-variant text-primary px-md py-sm rounded-xl
+                                  font-label-md hover:bg-surface-container transition-colors text-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="4"
+                           class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors text-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Family Connection Suite ── -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
+             data-type="Family" data-status="Available">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/FamilyConnectionSuiteRoom.png"
+                     alt="Family Connection Suite" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm
+                                 text-label-sm flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Available
+                    </span>
+                </div>
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 510, 5th Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.7</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Family Connection Suite</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">family_restroom</span>
+                        <span class="text-body-sm">Sleeps 4</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">kitchen</span>
+                        <span class="text-body-sm">Kitchenette</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">bathtub</span>
+                        <span class="text-body-sm">Bathtub</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <span class="font-headline-sm text-headline-sm text-primary">$380.00</span>
+                    </div>
+                    <div class="flex gap-sm">
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="5"
+                           class="border border-outline-variant text-primary px-md py-sm rounded-xl
+                                  font-label-md hover:bg-surface-container transition-colors text-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="5"
+                           class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors text-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Executive Studio ── -->
+        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
+             data-type="Suite" data-status="Available">
+            <div class="relative h-52 overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/rooms/Rooms_Dashboard/ExecutiveStudioRoom.png"
+                     alt="Executive Studio" />
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm
+                                 text-label-sm flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Available
+                    </span>
+                </div>
+                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                        onclick="toggleSave(this)">
+                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                </button>
+            </div>
+            <div class="p-lg flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-xs">
+                    <p class="text-on-surface-variant font-label-sm text-label-sm">Room 102, 1st Floor</p>
+                    <div class="flex items-center gap-1 text-primary">
+                        <span class="material-symbols-outlined text-[16px]"
+                              style="font-variation-settings:'FILL' 1">star</span>
+                        <span class="font-bold text-label-sm">4.5</span>
+                    </div>
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Executive Studio</h3>
+                <div class="flex flex-wrap gap-md mb-lg">
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">desk</span>
+                        <span class="text-body-sm">Work Desk</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">microwave</span>
+                        <span class="text-body-sm">Pantry</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px]">wifi</span>
+                        <span class="text-body-sm">WiFi</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-lg border-t border-outline-variant/30
+                            flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                        <div class="flex items-center gap-2">
+                            <span class="font-headline-sm text-headline-sm text-primary">$150.00</span>
+                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed
+                                         px-2 py-0.5 rounded font-medium">AI Priced</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-sm">
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="6"
+                           class="border border-outline-variant text-primary px-md py-sm rounded-xl
+                                  font-label-md hover:bg-surface-container transition-colors text-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Room" asp-action="Details" asp-route-id="6"
+                           class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md
+                                  hover:bg-primary-container transition-colors text-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══ PAGINATION ═══ -->
+    <div class="mt-xl flex justify-between items-center bg-surface-container-lowest p-md
+                rounded-xl shadow-sm border border-outline-variant/20">
+        <p class="text-body-sm text-on-surface-variant">
+            Showing <span class="font-bold text-on-surface">6</span> of
+            <span class="font-bold text-on-surface">24</span> rooms
+        </p>
+        <div class="flex gap-2">
+            <button class="w-10 h-10 flex items-center justify-center rounded-xl
+                           border border-outline-variant text-on-surface-variant
+                           hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-xl
+                           bg-primary text-on-primary font-bold">1</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-xl
+                           border border-outline-variant text-on-surface-variant
+                           hover:bg-surface-container transition-colors">2</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-xl
+                           border border-outline-variant text-on-surface-variant
+                           hover:bg-surface-container transition-colors">3</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-xl
+                           border border-outline-variant text-on-surface-variant
+                           hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // ── Tab filter ──
+    function filterRooms(type, btn) {
+        document.querySelectorAll('.room-tab').forEach(t => {
+            t.classList.remove('text-primary', 'border-primary');
+            t.classList.add('text-on-surface-variant', 'border-transparent');
+        });
+        btn.classList.remove('text-on-surface-variant', 'border-transparent');
+        btn.classList.add('text-primary', 'border-primary');
+
+        document.querySelectorAll('.room-card').forEach(card => {
+            const matchType   = type === 'All Rooms' || card.dataset.type === type;
+            const matchAvail  = type !== 'Available'  || card.dataset.status === 'Available';
+            card.style.display = (matchType && matchAvail) ? 'flex' : 'none';
+        });
+    }
+
+    // ── Search filter ──
+    document.getElementById('searchInput')?.addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.room-card').forEach(card => {
+            const name = card.querySelector('h3')?.textContent.toLowerCase() ?? '';
+            card.style.display = name.includes(q) ? 'flex' : 'none';
+        });
+    });
+
+    // ── Save/Wishlist toggle ──
+function toggleSave(btn) {
+    const icon = btn.querySelector('.material-symbols-outlined');
+    const card = btn.closest('.room-card');
+
+    // Get room data from the card
+    const room = {
+        id:    card.dataset.roomId,
+        name:  card.querySelector('h3').textContent.trim(),
+        floor: card.querySelector('.room-floor').textContent.trim(),
+        price: parseFloat(card.dataset.price),
+        image: card.querySelector('img').src
+    };
+
+    let saved = JSON.parse(sessionStorage.getItem('swm_saved_rooms') || '[]');
+
+    if (icon.textContent.trim() === 'favorite_border') {
+        // ── Add to saved ──
+        icon.textContent = 'favorite';
+        icon.style.color = '#e53935';
+        icon.style.fontVariationSettings = "'FILL' 1";
+
+        if (!saved.find(r => r.id === room.id)) {
+            saved.push(room);
+            sessionStorage.setItem('swm_saved_rooms', JSON.stringify(saved));
+        }
+    } else {
+        // ── Remove from saved ──
+        icon.textContent = 'favorite_border';
+        icon.style.color = '';
+        icon.style.fontVariationSettings = "'FILL' 0";
+
+        saved = saved.filter(r => r.id !== room.id);
+        sessionStorage.setItem('swm_saved_rooms', JSON.stringify(saved));
+    }
+}
+</script>
+}
+    
