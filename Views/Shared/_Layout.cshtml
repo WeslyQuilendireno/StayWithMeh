@@ -32,7 +32,8 @@
                         "outline": "#75777f",
                         "primary": "#031635",
                         "surface-container-high": "#e9e7eb",
-                        "surface": "#fbf8fc"
+                        "surface": "#fbf8fc",
+                        "error": "#ba1a1a"
                     },
                     spacing: {
                         "lg": "24px", "xs": "4px", "gutter": "24px",
@@ -62,6 +63,8 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* ── Sliding nav underline ── */
         .nav-slider {
@@ -94,38 +97,43 @@
         <!-- Nav Links with sliding underline -->
         <nav class="hidden lg:flex items-center gap-6 relative h-full" id="mainNav">
 
-            <!-- The sliding underline bar -->
             <span class="nav-slider" id="navSlider"></span>
 
+            <!-- Home -->
             <a asp-controller="Home" asp-action="Index"
                class="nav-link text-sm font-medium h-full flex items-center
                       @(ViewData["ActivePage"]?.ToString() == "Home" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
                data-nav="Home">Home</a>
 
+            <!-- Explore -->
             <a asp-controller="Explore" asp-action="Index"
                class="nav-link text-sm font-medium h-full flex items-center
                       @(ViewData["ActivePage"]?.ToString() == "Explore" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
                data-nav="Explore">Explore</a>
 
+            <!-- Bookings -->
             <a asp-controller="Booking" asp-action="MyBookings"
                class="nav-link text-sm font-medium h-full flex items-center
                       @(ViewData["ActivePage"]?.ToString() == "Bookings" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
                data-nav="Bookings">Bookings</a>
 
-            <a href="#"
+            <!-- Rooms -->
+            <a asp-controller="Room" asp-action="Index"
                class="nav-link text-sm font-medium h-full flex items-center
                       @(ViewData["ActivePage"]?.ToString() == "Rooms" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
                data-nav="Rooms">Rooms</a>
 
-            <a href="#"
+            <!-- Saved -->
+            <a asp-controller="Wishlist" asp-action="Index"
                class="nav-link text-sm font-medium h-full flex items-center
-                      @(ViewData["ActivePage"]?.ToString() == "Analytics" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
-               data-nav="Analytics">Analytics</a>
+                      @(ViewData["ActivePage"]?.ToString() == "Saved" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Saved">Saved</a>
 
-            <a href="#"
+            <!-- Support -->
+            <a asp-controller="Support" asp-action="Index"
                class="nav-link text-sm font-medium h-full flex items-center
-                      @(ViewData["ActivePage"]?.ToString() == "Staff" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
-               data-nav="Staff">Staff</a>
+                      @(ViewData["ActivePage"]?.ToString() == "Support" ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")"
+               data-nav="Support">Support</a>
         </nav>
 
         <!-- Right Actions -->
@@ -133,15 +141,21 @@
             <div class="relative hidden xl:block">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary text-xl">search</span>
                 <input type="text" placeholder="Search bookings..."
-                       class="bg-surface-container border-none rounded-lg pl-10 pr-4 py-2 text-sm w-56 focus:ring-0 placeholder:text-outline" />
+                       class="bg-surface-container border-none rounded-lg pl-10 pr-4 py-2 text-sm w-56
+                              focus:ring-0 placeholder:text-outline" />
             </div>
-            <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-1 hover:bg-primary-container transition-colors">
+            <a asp-controller="Booking" asp-action="MyBookings"
+               class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center
+                      gap-1 hover:bg-primary-container transition-colors">
                 <span class="material-symbols-outlined text-lg">add</span> Add Booking
-            </button>
+            </a>
             <div class="flex items-center gap-2">
-                <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">notifications</button>
-                <button class="material-symbols-outlined text-primary hover:bg-surface-container rounded-full p-1.5 transition-colors">settings</button>
-                <div class="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant flex items-center justify-center ml-1 cursor-pointer">
+                <button class="material-symbols-outlined text-primary hover:bg-surface-container
+                               rounded-full p-1.5 transition-colors">notifications</button>
+                <button class="material-symbols-outlined text-primary hover:bg-surface-container
+                               rounded-full p-1.5 transition-colors">settings</button>
+                <div class="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant
+                            flex items-center justify-center ml-1 cursor-pointer">
                     <span class="material-symbols-outlined text-primary">person</span>
                 </div>
             </div>
@@ -160,7 +174,8 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-xl mb-xl">
             <div class="flex flex-col gap-md">
                 <span class="text-2xl font-black">StayWithMeh</span>
-                <p class="text-body-sm opacity-60">The operating system for modern hospitality. Seamless management for hotels, effortless stays for guests.</p>
+                <p class="text-body-sm opacity-60">The operating system for modern hospitality.
+                    Seamless management for hotels, effortless stays for guests.</p>
                 <div class="flex gap-md mt-sm">
                     <span class="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100">language</span>
                     <span class="material-symbols-outlined cursor-pointer opacity-60 hover:opacity-100">share</span>
@@ -215,7 +230,6 @@
         const slider = document.getElementById('navSlider');
         if (!nav || !slider) return;
 
-        // Find the currently active link
         const activePage = "@ViewData["ActivePage"]";
         const links = nav.querySelectorAll('.nav-link');
 
@@ -226,12 +240,10 @@
             slider.style.width = linkRect.width + 'px';
         }
 
-        // Set initial position on active link (no transition on load)
         links.forEach(link => {
             if (link.dataset.nav === activePage) {
                 slider.style.transition = 'none';
                 moveSliderTo(link);
-                // Re-enable transition after paint
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         slider.style.transition = '';
@@ -240,12 +252,10 @@
             }
         });
 
-        // Hover: slide to hovered link
         links.forEach(link => {
             link.addEventListener('mouseenter', () => moveSliderTo(link));
         });
 
-        // Mouse leave nav: return to active link
         nav.addEventListener('mouseleave', () => {
             links.forEach(link => {
                 if (link.dataset.nav === activePage) moveSliderTo(link);
