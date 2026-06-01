@@ -1,8 +1,9 @@
-#  StayWithMeh — Weekly Sprint Log
-**Project:** SmartStay Hotel Management System  
-**Developer:** Wesly Quilendireno  
-**Stack:** ASP.NET Core MVC · C# · Supabase · Tailwind CSS · Python   
-**Repository:** https://github.com/WeslyQuilendireno/StayWithMeh 
+# StayWithMeh — Weekly Sprint Log
+
+**Project:** SmartStay Hotel Management System
+**Developer:** Wesly Quilendireno
+**Stack:** ASP.NET Core MVC · C# · Supabase · Tailwind CSS · Python
+**Repository:** https://github.com/WeslyQuilendireno/StayWithMeh
 
 ---
 
@@ -15,7 +16,7 @@ A full-stack web-based Hotel Management System supporting multiple user roles (G
 ## Week 1 — May 24–31, 2026
 
 ### Sprint Goal
-Set up the project foundation, design system, database, and implement the Guest Landing Page(Home,Explore,Bookings,Room,Saved,Support(unfinished)).
+Set up the project foundation, design system, database, and implement all Guest-facing pages (Home, Explore, Bookings, Room, Saved, Support).
 
 ---
 
@@ -54,7 +55,7 @@ Set up the project foundation, design system, database, and implement the Guest 
   - `DotNetEnv` v3.2.0
 - Configured **User Secrets** for Supabase credentials (never committed to Git)
 - Set up `.gitignore` to exclude `secrets.json` and sensitive files
-- Created **private GitHub repository**: `WeslyQuilendireno/StayWithMeh`
+- Created **GitHub repository**: `WeslyQuilendireno/StayWithMeh`
 - Made initial commit and push
 
 #### Database Setup (Supabase)
@@ -72,25 +73,31 @@ Set up the project foundation, design system, database, and implement the Guest 
 - Enabled **Realtime** on all tables
 - Set up Foreign Key relationships: bookings → guests, bookings → rooms, invoices → bookings
 
-#### Guest Landing Page Implementation
+#### Guest Pages Implementation
 - Created `Views/Shared/_Layout.cshtml`:
   - Fixed top navigation bar (StayWithMeh logo, nav links, Add Booking button)
   - Active page highlighting via `ViewData["ActivePage"]`
   - Scroll effect on header (shadow + blur on scroll)
   - Full footer (4-column: Brand, Destinations, Company, Support)
-- Created `Views/Home/Index.cshtml`:
+- Created `Views/Home/Index.cshtml` — Guest Landing Page:
   - Hero section with full-screen hotel lobby image
   - Search bar (Where To, Check-in/Check-out, Guests & Rooms, Search button)
   - Bento grid layout for 4 room types (Standard, Deluxe, Family, Business)
   - Newsletter subscription section
   - Trust indicators (50,000+ bookings, Sustainable Luxury)
+- Created `Views/Explore/Index.cshtml` — Explore Destinations & Rooms
+- Created `Views/Booking/MyBookings.cshtml` — My Bookings page
+- Created `Views/Room/Index.cshtml` — Room Details & Booking
+- Created `Views/Wishlist/Index.cshtml` — Saved Rooms Wishlist
+- Created `Views/Support/Index.cshtml` — Customer Support Center:
+  - Hero search bar with concern category dropdown (8 categories)
+  - FAQ accordion (Cancellations & Refunds, Check-in Policies, Payments & Billing)
+  - Empty state for "Your Support Requests" (no tickets shown by default)
+  - Live Chat and Email Support contact cards
+- Added `Controllers/SupportController.cs` to handle `/Support` routing
 - Added own custom images to `wwwroot/images/guest_landing_page_image/`:
   - `GuestLandingPageChandelier.png` — Hero background
-  - `StandardRoom.png`
-  - `DeluxeSuite.png`
-  - `FamilySuite.png`
-  - `BusinessSuite.png`
-- Pushed landing page to GitHub (commit: `Add Guest Landing Page - Index.cshtml and _Layout.cshtml`)
+  - `StandardRoom.png`, `DeluxeSuite.png`, `FamilySuite.png`, `BusinessSuite.png`
 
 ---
 
@@ -103,10 +110,11 @@ Set up the project foundation, design system, database, and implement the Guest 
 | C++ templates showing instead of C# | Language filter in project search | Changed dropdown to "C#" |
 | Extra folders created in `wwwroot` | Accidental folder creation | Deleted via File Explorer |
 | Duplicate `src` on hero image | Old Google URL not removed | Deleted placeholder URL |
+| 404 on `/Support` route | Missing SupportController | Added `SupportController.cs` |
 
 ---
 
-###  Progress Tracker
+### Progress Tracker
 
 #### Pages
 ```
@@ -115,7 +123,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 ✅ My Bookings
 ✅ Room Details & Booking
 ✅ Saved Rooms Wishlist
-⬜ Customer Support Center
+✅ Customer Support Center (UI complete)
 ⬜ Receptionist/Bookings Dashboard
 ⬜ Rooms Dashboard (Kanban)
 ⬜ Rooms Dashboard (Sidebar)
@@ -138,7 +146,7 @@ Set up the project foundation, design system, database, and implement the Guest 
 #### Infrastructure
 ```
 ✅ Visual Studio 2022 configured
-✅ GitHub private repo created
+✅ GitHub repo created
 ✅ .gitignore protecting secrets
 ✅ User Secrets for API keys
 ⬜ Deployment setup (Render)
@@ -146,10 +154,20 @@ Set up the project foundation, design system, database, and implement the Guest 
 
 ---
 
-### Next Sprint Goals (Week 2)
+## Week 2 — June 1–7, 2026
 
-- Customer Support Page
-- Function for each guest page 
+### Sprint Goal
+Make all guest-facing pages fully functional with real data from Supabase.
+
+### Planned Tasks
+- [ ] Create C# Models (`Room.cs`, `Guest.cs`, `Booking.cs`, `Invoice.cs`)
+- [ ] Configure Supabase connection in `Program.cs`
+- [ ] Wire Explore page to fetch live rooms data from Supabase
+- [ ] Wire Room Details page to display selected room info
+- [ ] Wire My Bookings page to fetch guest bookings
+- [ ] Wire Saved/Wishlist page to persist saved rooms
+- [ ] Implement search and filter on Explore page
+- [ ] Begin authentication flow (Guest login/register)
 
 ---
 
@@ -158,10 +176,9 @@ Set up the project foundation, design system, database, and implement the Guest 
 - Chose **Tailwind CSS via CDN** for rapid prototyping — will consider build pipeline later
 - Using **User Secrets** locally and **Environment Variables** for deployment
 - Room images stored in `wwwroot/images/` — will evaluate Supabase Storage for production
-- Python microservice planned for Week 4-5 after core booking flow is complete
-- Repository visibility: **Private** (contains hotel management logic)
+- Python microservice planned for Week 4–5 after core booking flow is complete
 
 ---
 
-*Last updated: May 31, 2026*  
+*Last updated: June 1, 2026*
 *Next update: End of Week 2*
