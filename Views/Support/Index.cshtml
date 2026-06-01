@@ -1,0 +1,340 @@
+@{
+    ViewData["Title"] = "Support";
+    ViewData["ActivePage"] = "Support";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+    }
+    .accordion-item.active .accordion-content {
+        max-height: 400px;
+    }
+    .accordion-item.active .arrow-icon {
+        transform: rotate(180deg);
+    }
+    .arrow-icon {
+        transition: transform 0.3s ease;
+    }
+
+    /* Concern dropdown */
+    .concern-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        z-index: 100;
+        overflow: hidden;
+        display: none;
+        border: 1px solid #c5c6cf;
+    }
+    .concern-dropdown.open {
+        display: block;
+    }
+    .concern-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-size: 15px;
+        color: #1b1b1e;
+    }
+    .concern-option:hover {
+        background: #f5f3f6;
+    }
+    .concern-option .mat-icon {
+        font-family: 'Material Symbols Outlined';
+        font-size: 20px;
+        color: #031635;
+    }
+
+    /* Empty state */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 56px 24px;
+        text-align: center;
+    }
+    .empty-state .icon-wrap {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: #efedf0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .empty-state .icon-wrap span {
+        font-size: 36px;
+        color: #75777f;
+    }
+</style>
+
+<!-- Hero FAQ Search Section -->
+<section class="relative py-xl bg-primary-container overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary-fixed rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-on-primary-container rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+    </div>
+    <div class="relative max-w-container-max mx-auto px-lg text-center py-xl">
+        <h1 class="text-display-lg font-display-lg text-on-primary mb-md">How can we help you?</h1>
+        <p class="text-body-lg font-body-lg text-on-primary-container max-w-2xl mx-auto mb-xl">
+            Search our knowledge base or browse common topics below to find quick solutions for your stay.
+        </p>
+
+        <!-- Search Bar with Concern Dropdown -->
+        <div class="max-w-2xl mx-auto relative" id="search-container">
+            <div class="flex items-center bg-white rounded-xl shadow-lg overflow-visible border-2 border-transparent focus-within:border-primary/30 transition-all">
+                <!-- Category Toggle Button -->
+                <button
+                    id="concern-toggle"
+                    type="button"
+                    onclick="toggleConcernDropdown(event)"
+                    class="flex items-center gap-1 pl-md pr-sm py-lg border-r border-outline-variant/40 text-label-md font-label-md text-primary whitespace-nowrap hover:bg-surface-container-low transition-colors shrink-0">
+                    <span class="material-symbols-outlined text-[18px]" id="concern-icon">help_center</span>
+                    <span id="concern-label" style="font-size:13px;">All Topics</span>
+                    <span class="material-symbols-outlined text-[16px]" id="concern-arrow" style="transition:transform .3s">expand_more</span>
+                </button>
+
+                <!-- Text Input -->
+                <input
+                    id="support-search"
+                    class="flex-1 border-none focus:ring-0 text-body-md text-on-surface px-md py-lg bg-transparent"
+                    placeholder="Describe your issue (e.g. 'How to cancel a booking')"
+                    type="text" />
+
+                <button type="button"
+                        class="mr-sm px-md py-xs bg-primary text-on-primary rounded-lg text-label-sm font-label-sm hover:opacity-90 transition-opacity shrink-0">
+                    Search
+                </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="concern-dropdown" id="concern-dropdown">
+                <div class="concern-option" onclick="selectConcern('All Topics','help_center')">
+                    <span class="mat-icon">help_center</span> All Topics
+                </div>
+                <div class="concern-option" onclick="selectConcern('Cancellations &amp; Refunds','event_busy')">
+                    <span class="mat-icon">event_busy</span> Cancellations &amp; Refunds
+                </div>
+                <div class="concern-option" onclick="selectConcern('Check-in Policies','key')">
+                    <span class="mat-icon">key</span> Check-in Policies
+                </div>
+                <div class="concern-option" onclick="selectConcern('Payments &amp; Billing','payments')">
+                    <span class="mat-icon">payments</span> Payments &amp; Billing
+                </div>
+                <div class="concern-option" onclick="selectConcern('Room &amp; Amenities','bed')">
+                    <span class="mat-icon">bed</span> Room &amp; Amenities
+                </div>
+                <div class="concern-option" onclick="selectConcern('Wi-Fi &amp; Technical','wifi')">
+                    <span class="mat-icon">wifi</span> Wi-Fi &amp; Technical
+                </div>
+                <div class="concern-option" onclick="selectConcern('Booking Modifications','edit_calendar')">
+                    <span class="mat-icon">edit_calendar</span> Booking Modifications
+                </div>
+                <div class="concern-option" onclick="selectConcern('Other Concerns','support_agent')">
+                    <span class="mat-icon">support_agent</span> Other Concerns
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter mt-xl pb-xl">
+
+    <!-- Left Column — FAQ + Support Requests -->
+    <div class="lg:col-span-8 space-y-lg">
+
+        <h2 class="text-headline-md font-headline-md text-primary">Frequently Asked Questions</h2>
+
+        <div class="space-y-sm">
+
+            <!-- FAQ 1: Cancellations & Refunds (open by default) -->
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden active">
+                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                    <div class="flex items-center gap-md">
+                        <span class="material-symbols-outlined text-primary">event_busy</span>
+                        <span class="font-headline-sm text-headline-sm">Cancellations &amp; Refunds</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
+                        Guests may cancel most bookings up to <strong>24 hours before the scheduled check-in date</strong> to receive a full refund.
+                        Refunds are processed within <strong>5–7 business days</strong>, subject to your bank's processing schedule.
+                        Non-refundable reservations are not eligible for automatic refunds; however, guests experiencing exceptional
+                        circumstances are encouraged to contact our support team directly for case-by-case review.
+                        All cancellation requests must be submitted through your Bookings dashboard or via our support channels.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 2: Check-in Policies -->
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                    <div class="flex items-center gap-md">
+                        <span class="material-symbols-outlined text-primary">key</span>
+                        <span class="font-headline-sm text-headline-sm">Check-in Policies</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
+                        Standard check-in time is <strong>3:00 PM</strong> and check-out is at <strong>12:00 PM (noon)</strong>.
+                        Early check-in requests are subject to room availability and may be subject to an additional fee at the property's discretion.
+                        All guests are required to present a <strong>valid government-issued photo ID</strong> and the
+                        <strong>original credit or debit card</strong> used at the time of booking upon arrival.
+                        Failure to provide these documents may result in denial of check-in without a refund.
+                        Late check-out arrangements must be requested no later than 9:00 AM on the day of departure.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 3: Payments & Billing -->
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                    <div class="flex items-center gap-md">
+                        <span class="material-symbols-outlined text-primary">payments</span>
+                        <span class="font-headline-sm text-headline-sm">Payments &amp; Billing</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
+                        StayWithMeh accepts all major <strong>credit and debit cards</strong> (Visa, Mastercard, American Express),
+                        as well as select <strong>digital wallets</strong> and local payment methods where available.
+                        Full payment is charged at the time of booking confirmation.
+                        An official <strong>invoice or receipt</strong> is automatically generated and delivered to your registered
+                        email address upon successful payment.
+                        For guests requiring corporate billing arrangements or official receipts for reimbursement purposes,
+                        please contact our finance support team with your booking reference number and company details.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Your Support Requests — Empty State -->
+        <div class="mt-xl">
+            <h2 class="text-headline-md font-headline-md text-primary mb-lg">Your Support Requests</h2>
+            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
+                <div class="empty-state">
+                    <div class="icon-wrap">
+                        <span class="material-symbols-outlined">inbox</span>
+                    </div>
+                    <h3 class="text-headline-sm font-headline-sm text-on-surface mb-xs">No support requests yet</h3>
+                    <p class="text-body-sm text-on-surface-variant max-w-sm">
+                        You haven't submitted any support requests. If you need assistance, use the search above
+                        or reach out through Live Chat or Email Support.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Right Column — Contact Cards -->
+    <div class="lg:col-span-4 space-y-lg">
+        <h2 class="text-headline-md font-headline-md text-primary">Need more help?</h2>
+        <div class="space-y-md">
+
+            <!-- Live Chat -->
+            <div class="bg-primary text-on-primary p-lg rounded-xl shadow-lg group cursor-pointer hover:bg-primary-container transition-all">
+                <div class="flex items-center gap-md mb-md">
+                    <div class="w-12 h-12 bg-on-primary/10 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[28px]">chat</span>
+                    </div>
+                    <div>
+                        <h4 class="text-headline-sm font-headline-sm">Live Chat</h4>
+                        <p class="text-label-sm font-label-sm opacity-80">Wait time: &lt; 2 mins</p>
+                    </div>
+                </div>
+                <p class="text-body-sm mb-lg">Chat with our dedicated support agents in real-time for immediate assistance.</p>
+                <button type="button" class="w-full py-md bg-on-primary text-primary font-bold rounded-lg group-hover:scale-[1.02] transition-transform">
+                    Start Conversation
+                </button>
+            </div>
+
+            <!-- Email Support -->
+            <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:border-primary/50 transition-all cursor-pointer">
+                <div class="flex items-center gap-md mb-md">
+                    <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-[28px]">mail</span>
+                    </div>
+                    <div>
+                        <h4 class="text-headline-sm font-headline-sm text-on-surface">Email Support</h4>
+                        <p class="text-label-sm font-label-sm text-on-surface-variant">Response in 24 hours</p>
+                    </div>
+                </div>
+                <p class="text-body-sm text-on-surface-variant mb-lg">For complex inquiries or formal requests, please send us a detailed email.</p>
+                <button type="button" class="w-full py-md border-2 border-primary text-primary font-bold rounded-lg hover:bg-primary/5 transition-all">
+                    Submit a Ticket
+                </button>
+            </div>
+
+            <!-- 24/7 Banner -->
+            <div class="rounded-xl overflow-hidden relative h-48 group">
+                <img
+                    alt="Customer Service Agent"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6VvdULEtn7ktNaTH7L_R-N48akjdjC13SgbRCDzIlJI4z0TW75dH3q44J7FeCwxsf6lc71orvT3aHYqwxJuOgWq-ZytiOJJcBObOII7W5_Rp0R0Q3hYjOEyDbBMZgBFMOIDVNi5Q3z9jyhaBBxpOILdFdFOvaBGpWSn9Q_ID-Tl8X2luaUUk-lmjOeXMtLQ9ttdfkeD-bXghna6eYOrk9pQAqz62gxuKZb1YYtYfekGJqpU096wABI-U7LmPWm3lFZgrFL4c61qDz" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-md">
+                    <p class="text-on-primary text-label-sm font-label-sm">StayWithMeh Care</p>
+                    <h5 class="text-on-primary font-headline-sm">24/7 Global Assistance</h5>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // ── Accordion ──────────────────────────────────────────────
+    function toggleAccordion(btn) {
+        const parent = btn.closest('.accordion-item');
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            if (item !== parent) item.classList.remove('active');
+        });
+        parent.classList.toggle('active');
+    }
+
+    // ── Concern Dropdown ───────────────────────────────────────
+    function toggleConcernDropdown(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('concern-dropdown');
+        const arrow = document.getElementById('concern-arrow');
+        const open = dd.classList.toggle('open');
+        arrow.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    function selectConcern(label, icon) {
+        document.getElementById('concern-label').textContent = label;
+        document.getElementById('concern-icon').textContent = icon;
+        document.getElementById('concern-dropdown').classList.remove('open');
+        document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
+        document.getElementById('support-search').focus();
+    }
+
+    document.addEventListener('click', function (e) {
+        const container = document.getElementById('search-container');
+        if (container && !container.contains(e.target)) {
+            document.getElementById('concern-dropdown').classList.remove('open');
+            document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
+        }
+    });
+</script>
+}
