@@ -4,6 +4,91 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    .search-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        z-index: 9999;
+        min-width: 320px;
+        animation: dropIn 0.18s ease;
+    }
+    .search-dropdown.open { display: block; }
+    @@keyframes dropIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .search-panel { position: relative; }
+
+    .date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .date-cell {
+        aspect-ratio: 1;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px;
+        font-size: 13px; cursor: pointer; transition: all 0.15s;
+        min-width: 36px; min-height: 36px;
+    }
+    .date-cell:hover:not(.disabled):not(.empty) { background: #f0f4ff; }
+    .date-cell.today { font-weight: 700; border: 1.5px solid var(--md-sys-color-primary, #5b6ad0); }
+    .date-cell.selected-start, .date-cell.selected-end {
+        background: var(--md-sys-color-primary, #5b6ad0) !important;
+        color: white !important; border-radius: 8px;
+    }
+    .date-cell.in-range {
+        background: #eef0ff; color: #3c4299;
+    }
+    .date-cell.disabled { opacity: 0.3; cursor: not-allowed; }
+    .date-cell.empty { cursor: default; }
+
+    .room-chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 14px; border-radius: 99px; cursor: pointer;
+        border: 1.5px solid #e2e8f0; background: white;
+        font-size: 13px; font-weight: 500; transition: all 0.15s;
+        color: #374151; white-space: nowrap;
+    }
+    .room-chip:hover { border-color: #a5b4fc; background: #f5f3ff; color: #4338ca; }
+    .room-chip.active {
+        background: var(--md-sys-color-primary, #5b6ad0);
+        border-color: var(--md-sys-color-primary, #5b6ad0);
+        color: white;
+    }
+
+    .suggestion-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px; border-radius: 99px;
+        border: 1.5px solid #e2e8f0; background: white;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        color: #374151; transition: all 0.15s;
+    }
+    .suggestion-chip:hover { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+
+    .counter-btn {
+        width: 32px; height: 32px; border-radius: 50%;
+        border: 1.5px solid #d1d5db; background: white;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 18px; transition: all 0.15s;
+        color: #374151;
+    }
+    .counter-btn:hover { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+    .counter-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .location-option {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 14px; border-radius: 10px; cursor: pointer;
+        transition: background 0.12s;
+    }
+    .location-option:hover { background: #f5f3ff; }
+    .location-option .flag { font-size: 22px; }
+    .location-option .loc-name { font-weight: 600; font-size: 14px; color: #1e293b; }
+    .location-option .loc-sub  { font-size: 12px; color: #64748b; }
+</style>
+
 <!-- ═══════════════════════════════════════════════
      HERO SECTION
 ═══════════════════════════════════════════════ -->
@@ -18,43 +103,190 @@
             Experience the pinnacle of hospitality where modern technology meets timeless luxury. Your perfect room is just a search away.
         </p>
 
-        <!-- Search Bar -->
-        <div class="w-full max-w-5xl mt-10 bg-surface-container-lowest shadow-lg rounded-xl flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-outline-variant border border-outline-variant overflow-hidden text-left">
+        <!-- ── Room Type Filter Chips ── -->
+        <div class="flex flex-wrap justify-center gap-2 mt-6 mb-4" id="roomTypeChips">
+            <button class="room-chip active" data-type="" onclick="selectRoomType(this, '')">
+                <span class="material-symbols-outlined text-sm" style="font-size:15px">hotel</span> All Rooms
+            </button>
+            <button class="room-chip" data-type="Standard" onclick="selectRoomType(this, 'Standard')">
+                <span class="material-symbols-outlined text-sm" style="font-size:15px">bed</span> Standard
+            </button>
+            <button class="room-chip" data-type="Deluxe" onclick="selectRoomType(this, 'Deluxe')">
+                <span class="material-symbols-outlined text-sm" style="font-size:15px">king_bed</span> Deluxe Suite
+            </button>
+            <button class="room-chip" data-type="Family" onclick="selectRoomType(this, 'Family')">
+                <span class="material-symbols-outlined text-sm" style="font-size:15px">family_restroom</span> Family Suite
+            </button>
+            <button class="room-chip" data-type="BusinessSuite" onclick="selectRoomType(this, 'BusinessSuite')">
+                <span class="material-symbols-outlined text-sm" style="font-size:15px">business_center</span> Business Suite
+            </button>
+        </div>
 
-            <!-- Where To -->
-            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
+        <!-- ── Main Search Bar ── -->
+        <div class="w-full max-w-5xl bg-surface-container-lowest shadow-lg rounded-xl flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-outline-variant border border-outline-variant overflow-visible text-left relative">
+
+            <!-- WHERE TO -->
+            <div class="search-panel flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group rounded-l-xl"
+                 onclick="togglePanel('locationPanel', event)">
                 <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Where To?</span>
                 <div class="flex items-center gap-xs">
                     <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">location_on</span>
-                    <input class="bg-transparent border-none focus:ring-0 font-headline-sm text-headline-sm p-0 w-full text-on-surface placeholder:text-outline-variant"
-                           placeholder="Search destinations..." type="text" name="destination" />
+                    <span class="font-headline-sm text-headline-sm text-on-surface" id="locationDisplay">Search destinations...</span>
+                </div>
+                <!-- Location Dropdown -->
+                <div class="search-dropdown" id="locationPanel" style="width:300px" onclick="event.stopPropagation()">
+                    <div class="p-4">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Popular Destinations</p>
+                        <div class="location-option" onclick="selectLocation('New York', 'United States', '🇺🇸')">
+                            <span class="flag">🇺🇸</span>
+                            <div><div class="loc-name">New York</div><div class="loc-sub">United States</div></div>
+                        </div>
+                        <div class="location-option" onclick="selectLocation('London', 'United Kingdom', '🇬🇧')">
+                            <span class="flag">🇬🇧</span>
+                            <div><div class="loc-name">London</div><div class="loc-sub">United Kingdom</div></div>
+                        </div>
+                        <div class="location-option" onclick="selectLocation('Tokyo', 'Japan', '🇯🇵')">
+                            <span class="flag">🇯🇵</span>
+                            <div><div class="loc-name">Tokyo</div><div class="loc-sub">Japan</div></div>
+                        </div>
+                        <div class="location-option" onclick="selectLocation('Dubai', 'UAE', '🇦🇪')">
+                            <span class="flag">🇦🇪</span>
+                            <div><div class="loc-name">Dubai</div><div class="loc-sub">United Arab Emirates</div></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Check-in / Check-out -->
-            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
-                <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Check-in - Check-out</span>
+            <!-- CHECK-IN / CHECK-OUT -->
+            <div class="search-panel flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group"
+                 onclick="togglePanel('datePanel', event)">
+                <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Check-in — Check-out</span>
                 <div class="flex items-center gap-xs">
                     <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">calendar_month</span>
-                    <span class="font-headline-sm text-headline-sm text-on-surface" id="dateDisplay">Oct 24 - Oct 28</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface" id="dateDisplay">Select dates</span>
+                </div>
+                <!-- Date Dropdown -->
+                <div class="search-dropdown" id="datePanel" style="width:680px;left:-1px" onclick="event.stopPropagation()">
+                    <div class="p-5">
+                        <div class="flex gap-6">
+                            <!-- Check-in calendar -->
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-3">
+                                    <button onclick="shiftMonth(-1)" class="counter-btn"><span class="material-symbols-outlined" style="font-size:18px">chevron_left</span></button>
+                                    <span id="calMonthLabel" class="font-semibold text-slate-700 text-sm"></span>
+                                    <button onclick="shiftMonth(1)" class="counter-btn"><span class="material-symbols-outlined" style="font-size:18px">chevron_right</span></button>
+                                </div>
+                                <div class="date-grid mb-1">
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Su</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Mo</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Tu</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">We</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Th</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Fr</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Sa</div>
+                                </div>
+                                <div class="date-grid" id="calGrid"></div>
+                            </div>
+                            <!-- Next month calendar -->
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div style="width:32px"></div>
+                                    <span id="calMonthLabel2" class="font-semibold text-slate-700 text-sm"></span>
+                                    <div style="width:32px"></div>
+                                </div>
+                                <div class="date-grid mb-1">
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Su</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Mo</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Tu</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">We</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Th</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Fr</div>
+                                    <div class="date-cell empty text-slate-400 font-medium text-xs">Sa</div>
+                                </div>
+                                <div class="date-grid" id="calGrid2"></div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400" id="dateHint">Select check-in date</span>
+                            <button onclick="clearDates()" class="text-xs text-indigo-500 font-semibold hover:text-indigo-700">Clear dates</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Guests & Rooms -->
-            <div class="flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group">
+            <!-- GUESTS & ROOMS -->
+            <div class="search-panel flex-1 p-md flex flex-col gap-xs hover:bg-surface-container-low transition-colors cursor-pointer group"
+                 onclick="togglePanel('guestPanel', event)">
                 <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Guests &amp; Rooms</span>
                 <div class="flex items-center gap-xs">
                     <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">group</span>
-                    <span class="font-headline-sm text-headline-sm text-on-surface">2 Guests, 1 Room</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface" id="guestDisplay">2 Guests, 1 Room</span>
+                </div>
+                <!-- Guests Dropdown -->
+                <div class="search-dropdown" id="guestPanel" style="width:320px" onclick="event.stopPropagation()">
+                    <div class="p-4 flex flex-col gap-4">
+                        <!-- Adults -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-slate-700 text-sm">Adults</p>
+                                <p class="text-xs text-slate-400">Ages 13+</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button class="counter-btn" onclick="changeCount('adults',-1)" id="adultsMinus">−</button>
+                                <span id="adultsVal" class="w-6 text-center font-bold text-slate-700">2</span>
+                                <button class="counter-btn" onclick="changeCount('adults',1)">+</button>
+                            </div>
+                        </div>
+                        <!-- Children -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-slate-700 text-sm">Children</p>
+                                <p class="text-xs text-slate-400">Ages 2–12</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button class="counter-btn" onclick="changeCount('children',-1)" id="childrenMinus">−</button>
+                                <span id="childrenVal" class="w-6 text-center font-bold text-slate-700">0</span>
+                                <button class="counter-btn" onclick="changeCount('children',1)">+</button>
+                            </div>
+                        </div>
+                        <!-- Rooms -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-slate-700 text-sm">Rooms</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button class="counter-btn" onclick="changeCount('rooms',-1)" id="roomsMinus">−</button>
+                                <span id="roomsVal" class="w-6 text-center font-bold text-slate-700">1</span>
+                                <button class="counter-btn" onclick="changeCount('rooms',1)">+</button>
+                            </div>
+                        </div>
+                        <!-- Smart Suggestion -->
+                        <div id="roomSuggestion" class="pt-3 border-t border-slate-100">
+                            <p class="text-xs text-slate-400 mb-2">Suggested room types</p>
+                            <div id="suggestionChips" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <button onclick="closePanel('guestPanel')"
+                                class="w-full py-2 rounded-xl text-white text-sm font-bold transition-colors"
+                                style="background: var(--md-sys-color-primary, #5b6ad0)">Done</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Search Button -->
-            <a asp-controller="Explore" asp-action="Index"
-               class="bg-primary flex items-center justify-center p-md md:w-32 group cursor-pointer hover:bg-primary-container transition-colors">
+            <!-- SEARCH BUTTON -->
+            <a id="searchBtn" href="/Explore"
+               class="bg-primary flex items-center justify-center p-md md:w-32 group cursor-pointer hover:bg-primary-container transition-colors rounded-r-xl"
+               onclick="updateSearchUrl(event)">
                 <span class="material-symbols-outlined text-white text-3xl group-hover:scale-125 transition-transform">search</span>
             </a>
         </div>
+
+        <!-- Hidden state inputs (used to build URL) -->
+        <input type="hidden" id="hiddenDestination" value="" />
+        <input type="hidden" id="hiddenCheckIn" value="" />
+        <input type="hidden" id="hiddenCheckOut" value="" />
+        <input type="hidden" id="hiddenGuests" value="2" />
+        <input type="hidden" id="hiddenRooms" value="1" />
+        <input type="hidden" id="hiddenRoomType" value="" />
     </div>
 </section>
 
@@ -74,46 +306,32 @@
 
     <!-- Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter h-[800px] md:h-[650px]">
-
-        <!-- Standard Room — Tall Left -->
         <div class="md:col-span-1 md:row-span-2 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
-            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                 src="~/images/guest_landing_page_image/StandardRoom.png"
-                 alt="Standard Room" />
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="~/images/guest_landing_page_image/StandardRoom.png" alt="Standard Room" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
                 <span class="bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full w-fit mb-xs">Available</span>
                 <h3 class="text-white font-headline-md text-headline-md">Standard Room</h3>
                 <p class="text-white/80 font-body-sm text-body-sm mb-md">Essential comfort with a modern touch.</p>
                 <div class="flex justify-between items-center pt-md border-t border-white/20">
                     <span class="text-white font-headline-sm text-headline-sm">$129<span class="text-body-sm font-normal">/night</span></span>
-                    <a asp-controller="Room" asp-action="Details" asp-route-type="standard"
-                       class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
+                    <a asp-controller="Room" asp-action="Details" asp-route-type="standard" class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
                 </div>
             </div>
         </div>
-
-        <!-- Deluxe Suite — Wide Top -->
         <div class="md:col-span-2 md:row-span-1 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
-            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                 src="~/images/guest_landing_page_image/DeluxeSuite.png"
-                 alt="Deluxe Suite" />
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="~/images/guest_landing_page_image/DeluxeSuite.png" alt="Deluxe Suite" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
                 <span class="bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full w-fit mb-xs">Featured</span>
                 <h3 class="text-white font-headline-md text-headline-md">Deluxe Suite</h3>
                 <p class="text-white/80 font-body-sm text-body-sm mb-md">Spacious elegance for the discerning traveler.</p>
                 <div class="flex justify-between items-center pt-md border-t border-white/20">
                     <span class="text-white font-headline-sm text-headline-sm">$249<span class="text-body-sm font-normal">/night</span></span>
-                    <a asp-controller="Room" asp-action="Details" asp-route-type="deluxe"
-                       class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
+                    <a asp-controller="Room" asp-action="Details" asp-route-type="deluxe" class="bg-white text-primary px-md py-sm rounded-lg font-bold text-label-md hover:bg-surface-container transition-colors">Book Now</a>
                 </div>
             </div>
         </div>
-
-        <!-- Family Suite — Right -->
         <div class="md:col-span-1 md:row-span-1 group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest transition-all hover:shadow-xl hover:-translate-y-1">
-            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                 src="~/images/guest_landing_page_image/FamilySuite.png"
-                 alt="Family Suite" />
+            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="~/images/guest_landing_page_image/FamilySuite.png" alt="Family Suite" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-lg flex flex-col justify-end">
                 <h3 class="text-white font-headline-sm text-headline-sm">Family Suite</h3>
                 <div class="flex justify-between items-center mt-md">
@@ -122,16 +340,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Bottom Row: Business Suite + USP Card -->
         <div class="md:col-span-3 md:row-span-1 grid grid-cols-1 md:grid-cols-2 gap-gutter">
-
-            <!-- Business Suite -->
             <div class="group relative rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-lowest flex transition-all hover:shadow-xl hover:-translate-y-1">
                 <div class="w-1/2 overflow-hidden">
-                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                         src="~/images/guest_landing_page_image/BusinessSuite.png"
-                         alt="Business Suite" />
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="~/images/guest_landing_page_image/BusinessSuite.png" alt="Business Suite" />
                 </div>
                 <div class="w-1/2 p-lg flex flex-col justify-center">
                     <h3 class="text-primary font-headline-md text-headline-md">Business Suite</h3>
@@ -152,8 +364,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- USP Card -->
             <div class="bg-primary text-white p-lg rounded-xl flex flex-col justify-between">
                 <div>
                     <h4 class="font-headline-sm text-headline-sm mb-xs">Why stay at StayWithMeh?</h4>
@@ -171,7 +381,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -180,14 +389,10 @@
 ═══════════════════════════════════════════════ -->
 <section class="bg-surface-container py-xl">
     <div class="max-w-[1440px] mx-auto px-lg grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
-
-        <!-- Newsletter Card -->
         <div class="p-xl bg-white rounded-2xl shadow-sm border border-outline-variant">
             <span class="text-primary font-bold tracking-tighter text-label-md uppercase mb-sm block">Join the inner circle</span>
             <h2 class="font-headline-lg text-headline-lg text-primary mb-md">Exclusive Offers for Members</h2>
-            <p class="font-body-md text-body-md text-on-surface-variant mb-xl">
-                Subscribe to our newsletter and receive personalized travel tips and priority booking rates for our global destinations.
-            </p>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-xl">Subscribe to our newsletter and receive personalized travel tips and priority booking rates for our global destinations.</p>
             <form asp-controller="Home" asp-action="Subscribe" method="post" class="flex gap-sm">
                 @Html.AntiForgeryToken()
                 <input class="flex-1 bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
@@ -195,8 +400,6 @@
                 <button type="submit" class="bg-primary text-white px-xl py-sm rounded-lg font-bold hover:bg-primary-container transition-all">Subscribe</button>
             </form>
         </div>
-
-        <!-- Trust Items -->
         <div class="flex flex-col gap-lg">
             <div class="flex gap-md items-start">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -221,15 +424,222 @@
 </section>
 
 @section Scripts {
-    <script>
-        // Search bar input focus ring
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', () => {
-                input.closest('.group')?.classList.add('ring-2', 'ring-primary', 'z-10');
-            });
-            input.addEventListener('blur', () => {
-                input.closest('.group')?.classList.remove('ring-2', 'ring-primary', 'z-10');
-            });
-        });
-    </script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+    destination: '', destinationFlag: '',
+    checkIn: null, checkOut: null, pickingEnd: false,
+    adults: 2, children: 0, rooms: 1,
+    roomType: ''
+};
+let calOffset = 0; // months from today
+
+// ═══════════════════════════════════════════════════════════
+// PANEL TOGGLE
+// ═══════════════════════════════════════════════════════════
+function togglePanel(id, e) {
+    e && e.stopPropagation();
+    const panel = document.getElementById(id);
+    const isOpen = panel.classList.contains('open');
+    document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('open'));
+    if (!isOpen) {
+        panel.classList.add('open');
+        if (id === 'datePanel') renderCalendars();
+    }
+}
+function closePanel(id) {
+    document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('click', () => {
+    document.querySelectorAll('.search-dropdown').forEach(d => d.classList.remove('open'));
+});
+
+// ═══════════════════════════════════════════════════════════
+// ROOM TYPE CHIPS
+// ═══════════════════════════════════════════════════════════
+function selectRoomType(el, type) {
+    document.querySelectorAll('.room-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    state.roomType = type;
+    document.getElementById('hiddenRoomType').value = type;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOCATION
+// ═══════════════════════════════════════════════════════════
+function selectLocation(city, country, flag) {
+    state.destination = city;
+    state.destinationFlag = flag;
+    document.getElementById('locationDisplay').textContent = flag + ' ' + city + ', ' + country;
+    document.getElementById('hiddenDestination').value = city;
+    closePanel('locationPanel');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATE PICKER
+// ═══════════════════════════════════════════════════════════
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function shiftMonth(dir) { calOffset += dir; renderCalendars(); }
+
+function renderCalendars() {
+    const base = new Date();
+    const m1 = new Date(base.getFullYear(), base.getMonth() + calOffset, 1);
+    const m2 = new Date(base.getFullYear(), base.getMonth() + calOffset + 1, 1);
+    document.getElementById('calMonthLabel').textContent  = MONTHS[m1.getMonth()] + ' ' + m1.getFullYear();
+    document.getElementById('calMonthLabel2').textContent = MONTHS[m2.getMonth()] + ' ' + m2.getFullYear();
+    renderMonth('calGrid',  m1);
+    renderMonth('calGrid2', m2);
+    updateDateHint();
+}
+
+function renderMonth(gridId, firstDay) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const year = firstDay.getFullYear(), month = firstDay.getMonth();
+    const startDow = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < startDow; i++) {
+        const el = document.createElement('div');
+        el.className = 'date-cell empty';
+        grid.appendChild(el);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month, d);
+        const el = document.createElement('div');
+        el.className = 'date-cell';
+        el.textContent = d;
+        if (date < today) { el.classList.add('disabled'); }
+        else {
+            if (date.getTime() === today.getTime()) el.classList.add('today');
+            if (state.checkIn && date.getTime() === state.checkIn.getTime()) el.classList.add('selected-start');
+            if (state.checkOut && date.getTime() === state.checkOut.getTime()) el.classList.add('selected-end');
+            if (state.checkIn && state.checkOut && date > state.checkIn && date < state.checkOut) el.classList.add('in-range');
+            el.addEventListener('click', () => pickDate(date));
+        }
+        grid.appendChild(el);
+    }
+}
+
+function pickDate(date) {
+    if (!state.checkIn || state.pickingEnd === false) {
+        state.checkIn = date; state.checkOut = null; state.pickingEnd = true;
+    } else {
+        if (date <= state.checkIn) {
+            state.checkIn = date; state.checkOut = null; state.pickingEnd = true;
+        } else {
+            state.checkOut = date; state.pickingEnd = false;
+            document.getElementById('hiddenCheckIn').value  = fmtDate(state.checkIn);
+            document.getElementById('hiddenCheckOut').value = fmtDate(state.checkOut);
+            updateDateDisplay();
+        }
+    }
+    renderCalendars();
+}
+
+function clearDates() {
+    state.checkIn = null; state.checkOut = null; state.pickingEnd = false;
+    document.getElementById('hiddenCheckIn').value = '';
+    document.getElementById('hiddenCheckOut').value = '';
+    document.getElementById('dateDisplay').textContent = 'Select dates';
+    renderCalendars();
+}
+
+function fmtDate(d) {
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+function fmtIso(d) {
+    return d.toISOString().split('T')[0];
+}
+function updateDateDisplay() {
+    if (state.checkIn && state.checkOut)
+        document.getElementById('dateDisplay').textContent = fmtDate(state.checkIn) + ' → ' + fmtDate(state.checkOut);
+}
+function updateDateHint() {
+    const hint = document.getElementById('dateHint');
+    if (!state.checkIn) hint.textContent = 'Select check-in date';
+    else if (!state.checkOut) hint.textContent = 'Now select check-out date';
+    else {
+        const nights = Math.round((state.checkOut - state.checkIn) / 86400000);
+        hint.textContent = nights + ' night' + (nights !== 1 ? 's' : '') + ' selected';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// GUEST COUNTER
+// ═══════════════════════════════════════════════════════════
+function changeCount(type, delta) {
+    const mins = { adults: 1, children: 0, rooms: 1 };
+    const maxs = { adults: 10, children: 6, rooms: 5 };
+    state[type] = Math.max(mins[type], Math.min(maxs[type], state[type] + delta));
+    document.getElementById(type + 'Val').textContent = state[type];
+    document.getElementById(type + 'Minus').disabled = state[type] <= mins[type];
+    document.getElementById('guestDisplay').textContent =
+        (state.adults + state.children) + ' Guest' + (state.adults + state.children > 1 ? 's' : '') +
+        ', ' + state.rooms + ' Room' + (state.rooms > 1 ? 's' : '');
+    document.getElementById('hiddenGuests').value = state.adults + state.children;
+    document.getElementById('hiddenRooms').value  = state.rooms;
+    updateSuggestions();
+}
+
+const suggestions = {
+    solo:   [{ label:'Standard',      type:'Standard',      icon:'bed' },
+             { label:'Deluxe Suite',  type:'Deluxe',        icon:'king_bed' },
+             { label:'Business Suite',type:'BusinessSuite', icon:'business_center' }],
+    couple: [{ label:'Deluxe Suite',  type:'Deluxe',        icon:'king_bed' },
+             { label:'Business Suite',type:'BusinessSuite', icon:'business_center' }],
+    family: [{ label:'Family Suite',  type:'Family',        icon:'family_restroom' },
+             { label:'Deluxe Suite',  type:'Deluxe',        icon:'king_bed' }],
+    group:  [{ label:'Family Suite',  type:'Family',        icon:'family_restroom' }]
+};
+
+function updateSuggestions() {
+    const total = state.adults + state.children;
+    let key = total === 1 ? 'solo' : total === 2 ? 'couple' : total <= 4 ? 'family' : 'group';
+    const chips = document.getElementById('suggestionChips');
+    const list = suggestions[key];
+    chips.innerHTML = list.map(s =>
+        `<button class="suggestion-chip" onclick="applySuggestion('${s.type}')">
+            <span class="material-symbols-outlined" style="font-size:14px">${s.icon}</span>${s.label}
+        </button>`
+    ).join('');
+
+    const label = document.querySelector('.search-dropdown#guestPanel p.text-xs.text-slate-400');
+    const msgs = { solo:'Great for solo travelers', couple:'Perfect for two', family:'Comfortable for families', group:'Best for groups' };
+    if (label) label.textContent = msgs[key];
+}
+
+function applySuggestion(type) {
+    document.querySelectorAll('.room-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.type === type);
+    });
+    state.roomType = type;
+    document.getElementById('hiddenRoomType').value = type;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH URL BUILDER
+// ═══════════════════════════════════════════════════════════
+function updateSearchUrl(e) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (state.destination) params.set('destination', state.destination);
+    if (state.checkIn)     params.set('checkIn',      fmtIso(state.checkIn));
+    if (state.checkOut)    params.set('checkOut',     fmtIso(state.checkOut));
+    if (state.adults + state.children > 0) params.set('guests', state.adults + state.children);
+    if (state.rooms > 0)  params.set('rooms',         state.rooms);
+    if (state.roomType)   params.set('roomType',      state.roomType);
+    window.location.href = '/Explore?' + params.toString();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+updateSuggestions();
+renderCalendars();
+</script>
 }
