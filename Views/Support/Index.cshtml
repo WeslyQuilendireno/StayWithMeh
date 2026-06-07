@@ -20,22 +20,28 @@
         transition: transform 0.3s ease;
     }
 
-    /* Concern dropdown */
-    .concern-dropdown {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        right: 0;
+    /*
+     * position:fixed so it escapes every stacking context.
+     * JS moves this element to <body> on load (portal pattern)
+     * so nothing in the DOM tree can ever paint over it.
+     */
+    #concern-dropdown {
+        position: fixed;
         background: white;
         border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        z-index: 100;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+        z-index: 2147483647; /* max possible z-index */
         overflow: hidden;
         display: none;
         border: 1px solid #c5c6cf;
     }
-    .concern-dropdown.open {
+    #concern-dropdown.open {
         display: block;
+        animation: dropIn 0.18s ease;
+    }
+    @@keyframes dropIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
     .concern-option {
         display: flex;
@@ -46,6 +52,7 @@
         transition: background 0.15s;
         font-size: 15px;
         color: #1b1b1e;
+        white-space: nowrap;
     }
     .concern-option:hover {
         background: #f5f3f6;
@@ -54,6 +61,7 @@
         font-family: 'Material Symbols Outlined';
         font-size: 20px;
         color: #031635;
+        flex-shrink: 0;
     }
 
     /* Empty state */
@@ -81,27 +89,35 @@
     }
 </style>
 
-<!-- Hero FAQ Search Section -->
-<section class="relative py-xl bg-primary-container overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
+<!-- ═══════════════════════════════════════════════
+     HERO FAQ SEARCH SECTION
+═══════════════════════════════════════════════ -->
+<section class="relative py-xl bg-primary-container">
+
+    <!-- Decorative blobs — clipped inside their own wrapper -->
+    <div class="absolute inset-0 opacity-10 overflow-hidden pointer-events-none">
         <div class="absolute top-0 right-0 w-96 h-96 bg-primary-fixed rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-on-primary-container rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
     </div>
+
     <div class="relative max-w-container-max mx-auto px-lg text-center py-xl">
         <h1 class="text-display-lg font-display-lg text-on-primary mb-md">How can we help you?</h1>
-        <p class="text-body-lg font-body-lg text-on-primary-container max-w-2xl mx-auto mb-xl">
+
+        <!-- ✅ FIX: text-white instead of text-on-primary-container -->
+        <p class="text-body-lg font-body-lg text-white max-w-2xl mx-auto mb-xl">
             Search our knowledge base or browse common topics below to find quick solutions for your stay.
         </p>
 
-        <!-- Search Bar with Concern Dropdown -->
-        <div class="max-w-2xl mx-auto relative" id="search-container">
-            <div class="flex items-center bg-white rounded-xl shadow-lg overflow-visible border-2 border-transparent focus-within:border-primary/30 transition-all">
-                <!-- Category Toggle Button -->
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto" id="search-container">
+            <div class="flex items-center bg-white rounded-xl shadow-lg border-2 border-transparent focus-within:border-primary/30 transition-all">
+
+                <!-- Category Toggle -->
                 <button
                     id="concern-toggle"
                     type="button"
                     onclick="toggleConcernDropdown(event)"
-                    class="flex items-center gap-1 pl-md pr-sm py-lg border-r border-outline-variant/40 text-label-md font-label-md text-primary whitespace-nowrap hover:bg-surface-container-low transition-colors shrink-0">
+                    class="flex items-center gap-1 pl-md pr-sm py-lg border-r border-outline-variant/40 text-label-md font-label-md text-primary whitespace-nowrap hover:bg-surface-container-low transition-colors shrink-0 rounded-l-xl">
                     <span class="material-symbols-outlined text-[18px]" id="concern-icon">help_center</span>
                     <span id="concern-label" style="font-size:13px;">All Topics</span>
                     <span class="material-symbols-outlined text-[16px]" id="concern-arrow" style="transition:transform .3s">expand_more</span>
@@ -119,51 +135,59 @@
                     Search
                 </button>
             </div>
-
-            <!-- Dropdown Menu -->
-            <div class="concern-dropdown" id="concern-dropdown">
-                <div class="concern-option" onclick="selectConcern('All Topics','help_center')">
-                    <span class="mat-icon">help_center</span> All Topics
-                </div>
-                <div class="concern-option" onclick="selectConcern('Cancellations &amp; Refunds','event_busy')">
-                    <span class="mat-icon">event_busy</span> Cancellations &amp; Refunds
-                </div>
-                <div class="concern-option" onclick="selectConcern('Check-in Policies','key')">
-                    <span class="mat-icon">key</span> Check-in Policies
-                </div>
-                <div class="concern-option" onclick="selectConcern('Payments &amp; Billing','payments')">
-                    <span class="mat-icon">payments</span> Payments &amp; Billing
-                </div>
-                <div class="concern-option" onclick="selectConcern('Room &amp; Amenities','bed')">
-                    <span class="mat-icon">bed</span> Room &amp; Amenities
-                </div>
-                <div class="concern-option" onclick="selectConcern('Wi-Fi &amp; Technical','wifi')">
-                    <span class="mat-icon">wifi</span> Wi-Fi &amp; Technical
-                </div>
-                <div class="concern-option" onclick="selectConcern('Booking Modifications','edit_calendar')">
-                    <span class="mat-icon">edit_calendar</span> Booking Modifications
-                </div>
-                <div class="concern-option" onclick="selectConcern('Other Concerns','support_agent')">
-                    <span class="mat-icon">support_agent</span> Other Concerns
-                </div>
-            </div>
         </div>
     </div>
 </section>
 
-<!-- Main Content -->
+<!--
+    Dropdown — JS will move this to <body> on DOMContentLoaded
+    (portal pattern). Keeps it in HTML near its trigger for
+    readability, but at runtime it lives at the root of <body>.
+-->
+<div id="concern-dropdown">
+    <div class="concern-option" onclick="selectConcern('All Topics','help_center')">
+        <span class="mat-icon">help_center</span> All Topics
+    </div>
+    <div class="concern-option" onclick="selectConcern('Cancellations &amp; Refunds','event_busy')">
+        <span class="mat-icon">event_busy</span> Cancellations &amp; Refunds
+    </div>
+    <div class="concern-option" onclick="selectConcern('Check-in Policies','key')">
+        <span class="mat-icon">key</span> Check-in Policies
+    </div>
+    <div class="concern-option" onclick="selectConcern('Payments &amp; Billing','payments')">
+        <span class="mat-icon">payments</span> Payments &amp; Billing
+    </div>
+    <div class="concern-option" onclick="selectConcern('Room &amp; Amenities','bed')">
+        <span class="mat-icon">bed</span> Room &amp; Amenities
+    </div>
+    <div class="concern-option" onclick="selectConcern('Wi-Fi &amp; Technical','wifi')">
+        <span class="mat-icon">wifi</span> Wi-Fi &amp; Technical
+    </div>
+    <div class="concern-option" onclick="selectConcern('Booking Modifications','edit_calendar')">
+        <span class="mat-icon">edit_calendar</span> Booking Modifications
+    </div>
+    <div class="concern-option" onclick="selectConcern('Other Concerns','support_agent')">
+        <span class="mat-icon">support_agent</span> Other Concerns
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════ -->
 <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter mt-xl pb-xl">
 
-    <!-- Left Column — FAQ + Support Requests -->
+    <!-- ── Left Column ── -->
     <div class="lg:col-span-8 space-y-lg">
 
         <h2 class="text-headline-md font-headline-md text-primary">Frequently Asked Questions</h2>
 
         <div class="space-y-sm">
 
-            <!-- FAQ 1: Cancellations & Refunds (open by default) -->
+            <!-- FAQ 1 — open by default -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden active">
-                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                <button type="button"
+                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
+                        onclick="toggleAccordion(this)">
                     <div class="flex items-center gap-md">
                         <span class="material-symbols-outlined text-primary">event_busy</span>
                         <span class="font-headline-sm text-headline-sm">Cancellations &amp; Refunds</span>
@@ -181,9 +205,11 @@
                 </div>
             </div>
 
-            <!-- FAQ 2: Check-in Policies -->
+            <!-- FAQ 2 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                <button type="button"
+                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
+                        onclick="toggleAccordion(this)">
                     <div class="flex items-center gap-md">
                         <span class="material-symbols-outlined text-primary">key</span>
                         <span class="font-headline-sm text-headline-sm">Check-in Policies</span>
@@ -202,9 +228,11 @@
                 </div>
             </div>
 
-            <!-- FAQ 3: Payments & Billing -->
+            <!-- FAQ 3 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <button type="button" class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" onclick="toggleAccordion(this)">
+                <button type="button"
+                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
+                        onclick="toggleAccordion(this)">
                     <div class="flex items-center gap-md">
                         <span class="material-symbols-outlined text-primary">payments</span>
                         <span class="font-headline-sm text-headline-sm">Payments &amp; Billing</span>
@@ -225,8 +253,8 @@
             </div>
 
         </div>
-
-        <!-- Your Support Requests — Empty State -->
+            
+        <!-- Your Support Requests -->
         <div class="mt-xl">
             <h2 class="text-headline-md font-headline-md text-primary mb-lg">Your Support Requests</h2>
             <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
@@ -245,7 +273,7 @@
 
     </div>
 
-    <!-- Right Column — Contact Cards -->
+    <!-- ── Right Column ── -->
     <div class="lg:col-span-4 space-y-lg">
         <h2 class="text-headline-md font-headline-md text-primary">Need more help?</h2>
         <div class="space-y-md">
@@ -303,7 +331,75 @@
 
 @section Scripts {
 <script>
-    // ── Accordion ──────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════
+    // PORTAL — move dropdown to <body> so it can never be
+    // clipped or buried by any ancestor stacking context.
+    // ════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+        const dd = document.getElementById('concern-dropdown');
+        if (dd && dd.parentElement !== document.body) {
+            document.body.appendChild(dd);
+        }
+    });
+
+    // ── Position helper ──────────────────────────────────────
+    function positionDropdown() {
+        const anchor = document.getElementById('search-container');
+        const dd     = document.getElementById('concern-dropdown');
+        if (!anchor || !dd) return;
+        const rect       = anchor.getBoundingClientRect();
+        dd.style.top     = (rect.bottom + 8) + 'px';
+        dd.style.left    = rect.left + 'px';
+        dd.style.width   = rect.width + 'px';
+        dd.style.maxHeight = (window.innerHeight - rect.bottom - 16) + 'px';
+        dd.style.overflowY = 'auto';
+    }
+
+    // ── Toggle ───────────────────────────────────────────────
+    function toggleConcernDropdown(e) {
+        e.stopPropagation();
+        const dd    = document.getElementById('concern-dropdown');
+        const arrow = document.getElementById('concern-arrow');
+        if (!dd.classList.contains('open')) {
+            positionDropdown();
+            dd.classList.add('open');
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            dd.classList.remove('open');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // ── Select option ────────────────────────────────────────
+    function selectConcern(label, icon) {
+        document.getElementById('concern-label').textContent = label;
+        document.getElementById('concern-icon').textContent  = icon;
+        document.getElementById('concern-dropdown').classList.remove('open');
+        document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
+        document.getElementById('support-search').focus();
+    }
+
+    // ── Close on outside click ───────────────────────────────
+    document.addEventListener('click', function (e) {
+        const toggle = document.getElementById('concern-toggle');
+        const dd     = document.getElementById('concern-dropdown');
+        if (!toggle || !dd) return;
+        if (!toggle.contains(e.target) && !dd.contains(e.target)) {
+            dd.classList.remove('open');
+            document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
+        }
+    });
+
+    // ── Reposition on scroll / resize ───────────────────────
+    window.addEventListener('scroll', function () {
+        if (document.getElementById('concern-dropdown').classList.contains('open')) positionDropdown();
+    }, { passive: true });
+
+    window.addEventListener('resize', function () {
+        if (document.getElementById('concern-dropdown').classList.contains('open')) positionDropdown();
+    });
+
+    // ── Accordion ────────────────────────────────────────────
     function toggleAccordion(btn) {
         const parent = btn.closest('.accordion-item');
         document.querySelectorAll('.accordion-item').forEach(item => {
@@ -311,30 +407,5 @@
         });
         parent.classList.toggle('active');
     }
-
-    // ── Concern Dropdown ───────────────────────────────────────
-    function toggleConcernDropdown(e) {
-        e.stopPropagation();
-        const dd = document.getElementById('concern-dropdown');
-        const arrow = document.getElementById('concern-arrow');
-        const open = dd.classList.toggle('open');
-        arrow.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-
-    function selectConcern(label, icon) {
-        document.getElementById('concern-label').textContent = label;
-        document.getElementById('concern-icon').textContent = icon;
-        document.getElementById('concern-dropdown').classList.remove('open');
-        document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
-        document.getElementById('support-search').focus();
-    }
-
-    document.addEventListener('click', function (e) {
-        const container = document.getElementById('search-container');
-        if (container && !container.contains(e.target)) {
-            document.getElementById('concern-dropdown').classList.remove('open');
-            document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
-        }
-    });
 </script>
 }
