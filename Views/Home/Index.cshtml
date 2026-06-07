@@ -513,7 +513,7 @@ function renderCalendars() {
     const m2 = new Date(base.getFullYear(), base.getMonth() + calOffset + 1, 1);
     document.getElementById('calMonthLabel').textContent  = MONTHS[m1.getMonth()] + ' ' + m1.getFullYear();
     document.getElementById('calMonthLabel2').textContent = MONTHS[m2.getMonth()] + ' ' + m2.getFullYear();
-    renderMonth('calGrid',  m1);
+    renderMonth('calGrid', m1);
     renderMonth('calGrid2', m2);
     updateDateHint();
 }
