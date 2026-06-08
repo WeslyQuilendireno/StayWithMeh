@@ -26,11 +26,11 @@
         margin-bottom: 20px;
     }
 
-    /* The dropdown itself — every property inline via JS,
+    /* The dropdown itself, every property inline via JS,
        but we also declare it here as a hard fallback  */
     #swm-dd {
         position: fixed !important;
-        z-index: 2147483647 !important;
+        z-index: 99999 !important;
         background: #ffffff;
         border: 1px solid #d1d5db;
         border-radius: 14px;
@@ -360,14 +360,14 @@
 // ════════════════════════════════════════════════════════════
 
 var DD_OPTIONS = [
-    { label: 'All Topics',               icon: 'help_center'    },
-    { label: 'Cancellations & Refunds',  icon: 'event_busy'     },
-    { label: 'Check-in Policies',        icon: 'key'            },
-    { label: 'Payments & Billing',       icon: 'payments'       },
-    { label: 'Room & Amenities',         icon: 'bed'            },
-    { label: 'Wi-Fi & Technical',        icon: 'wifi'           },
-    { label: 'Booking Modifications',    icon: 'edit_calendar'  },
-    { label: 'Other Concerns',           icon: 'support_agent'  }
+    { label: 'All Topics', icon: 'help_center'    },
+    { label: 'Cancellations & Refunds', icon: 'event_busy'     },
+    { label: 'Check-in Policies, icon: 'key'            },
+    { label: 'Payments & Billing, icon: 'payments'       },
+    { label: 'Room & Amenities, icon: 'bed'            },
+    { label: 'Wi-Fi & Technical, icon: 'wifi'           },
+    { label: 'Booking Modifications', icon: 'edit_calendar'  },
+    { label: 'Other Concerns', icon: 'support_agent'  }
 ];
 
 // Build the dropdown element once
@@ -462,7 +462,7 @@ window.addEventListener('resize', function() {
     if (_dd.style.display !== 'none') ddPosition();
 });
 
-// ── FAQ Accordion ──
+// FAQ Accordion
 function toggleAccordion(btn) {
     var item     = btn.closest('.accordion-item');
     var isActive = item.classList.contains('active');
