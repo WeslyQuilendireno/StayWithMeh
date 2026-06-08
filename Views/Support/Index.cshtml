@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Support";
+    ViewData["Title"]      = "Support";
     ViewData["ActivePage"] = "Support";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,402 +10,466 @@
         overflow: hidden;
         transition: max-height 0.4s ease-out;
     }
-    .accordion-item.active .accordion-content {
-        max-height: 400px;
+    .accordion-item.active .accordion-content { max-height: 500px; }
+    .accordion-item.active .arrow-icon { transform: rotate(180deg); }
+    .arrow-icon { transition: transform 0.3s ease; }
+
+    .empty-state {
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 56px 24px; text-align: center;
     }
-    .accordion-item.active .arrow-icon {
-        transform: rotate(180deg);
-    }
-    .arrow-icon {
-        transition: transform 0.3s ease;
+    .empty-icon-wrap {
+        width: 72px; height: 72px; border-radius: 50%;
+        background: #efedf0;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 20px;
     }
 
-    /*
-     * position:fixed so it escapes every stacking context.
-     * JS moves this element to <body> on load (portal pattern)
-     * so nothing in the DOM tree can ever paint over it.
-     */
-    #concern-dropdown {
-        position: fixed;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.22);
-        z-index: 2147483647; /* max possible z-index */
-        overflow: hidden;
+    /* The dropdown itself — every property inline via JS,
+       but we also declare it here as a hard fallback  */
+    #swm-dd {
+        position: fixed !important;
+        z-index: 2147483647 !important;
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.28);
+        overflow-y: auto;
+        max-height: 340px;
+        min-width: 280px;
         display: none;
-        border: 1px solid #c5c6cf;
     }
-    #concern-dropdown.open {
-        display: block;
-        animation: dropIn 0.18s ease;
-    }
-    @@keyframes dropIn {
-        from { opacity: 0; transform: translateY(-6px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    .concern-option {
+    #swm-dd .dd-row {
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 14px 20px;
+        padding: 13px 20px;
         cursor: pointer;
-        transition: background 0.15s;
-        font-size: 15px;
+        font-size: 14px;
+        font-weight: 500;
         color: #1b1b1e;
         white-space: nowrap;
+        font-family: 'Inter', sans-serif;
     }
-    .concern-option:hover {
-        background: #f5f3f6;
-    }
-    .concern-option .mat-icon {
+    #swm-dd .dd-row:hover { background: #f5f3f6; }
+    #swm-dd .dd-icon {
         font-family: 'Material Symbols Outlined';
         font-size: 20px;
         color: #031635;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         flex-shrink: 0;
-    }
-
-    /* Empty state */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 56px 24px;
-        text-align: center;
-    }
-    .empty-state .icon-wrap {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        background: #efedf0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-    .empty-state .icon-wrap span {
-        font-size: 36px;
-        color: #75777f;
     }
 </style>
 
-<!-- ═══════════════════════════════════════════════
-     HERO FAQ SEARCH SECTION
-═══════════════════════════════════════════════ -->
-<section class="relative py-xl bg-primary-container">
-
-    <!-- Decorative blobs — clipped inside their own wrapper -->
-    <div class="absolute inset-0 opacity-10 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-primary-fixed rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-on-primary-container rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
-    </div>
-
-    <div class="relative max-w-container-max mx-auto px-lg text-center py-xl">
-        <h1 class="text-display-lg font-display-lg text-on-primary mb-md">How can we help you?</h1>
-
-        <!-- ✅ FIX: text-white instead of text-on-primary-container -->
-        <p class="text-body-lg font-body-lg text-white max-w-2xl mx-auto mb-xl">
+<!-- ═══ HERO ═══ -->
+<section class="bg-primary py-16 px-gutter">
+    <div class="max-w-[1440px] mx-auto text-center">
+        <h1 class="text-white font-display-lg text-display-lg mb-md">How can we help you?</h1>
+        <p class="text-white/80 font-body-lg text-body-lg max-w-2xl mx-auto mb-xl">
             Search our knowledge base or browse common topics below to find quick solutions for your stay.
         </p>
 
-        <!-- Search Bar -->
-        <div class="max-w-2xl mx-auto" id="search-container">
-            <div class="flex items-center bg-white rounded-xl shadow-lg border-2 border-transparent focus-within:border-primary/30 transition-all">
-
-                <!-- Category Toggle -->
-                <button
-                    id="concern-toggle"
-                    type="button"
-                    onclick="toggleConcernDropdown(event)"
-                    class="flex items-center gap-1 pl-md pr-sm py-lg border-r border-outline-variant/40 text-label-md font-label-md text-primary whitespace-nowrap hover:bg-surface-container-low transition-colors shrink-0 rounded-l-xl">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex items-center bg-white rounded-xl shadow-lg">
+                <button id="concern-toggle" type="button"
+                        onclick="ddToggle(event)"
+                        class="flex items-center gap-1 pl-4 pr-3 py-4 border-r border-gray-200
+                               text-sm font-semibold text-primary whitespace-nowrap
+                               hover:bg-gray-50 transition-colors shrink-0 rounded-l-xl">
                     <span class="material-symbols-outlined text-[18px]" id="concern-icon">help_center</span>
-                    <span id="concern-label" style="font-size:13px;">All Topics</span>
-                    <span class="material-symbols-outlined text-[16px]" id="concern-arrow" style="transition:transform .3s">expand_more</span>
+                    <span id="concern-label">All Topics</span>
+                    <span class="material-symbols-outlined text-[16px]" id="concern-arrow"
+                          style="transition:transform .3s">expand_more</span>
                 </button>
-
-                <!-- Text Input -->
-                <input
-                    id="support-search"
-                    class="flex-1 border-none focus:ring-0 text-body-md text-on-surface px-md py-lg bg-transparent"
-                    placeholder="Describe your issue (e.g. 'How to cancel a booking')"
-                    type="text" />
-
+                <input id="support-search"
+                       class="flex-1 border-none focus:ring-0 text-base text-on-surface px-4 py-4 bg-transparent"
+                       placeholder="Describe your issue (e.g. 'How to cancel a booking')"
+                       type="text" />
                 <button type="button"
-                        class="mr-sm px-md py-xs bg-primary text-on-primary rounded-lg text-label-sm font-label-sm hover:opacity-90 transition-opacity shrink-0">
+                        class="mr-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold
+                               hover:bg-primary-container transition-colors shrink-0">
                     Search
                 </button>
             </div>
         </div>
+
+        <div class="flex flex-wrap justify-center gap-2 mt-6">
+            <button onclick="ddQuick('Cancellations & Refunds','event_busy')"
+                    class="bg-white/15 text-white border border-white/30 px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/25 transition-colors">
+                Cancel Booking
+            </button>
+            <button onclick="ddQuick('Check-in Policies','key')"
+                    class="bg-white/15 text-white border border-white/30 px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/25 transition-colors">
+                Check-in Time
+            </button>
+            <button onclick="ddQuick('Payments & Billing','payments')"
+                    class="bg-white/15 text-white border border-white/30 px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/25 transition-colors">
+                Refund Status
+            </button>
+            <button onclick="ddQuick('Wi-Fi & Technical','wifi')"
+                    class="bg-white/15 text-white border border-white/30 px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/25 transition-colors">
+                Wi-Fi Issues
+            </button>
+            <button onclick="ddQuick('Payments & Billing','payments')"
+                    class="bg-white/15 text-white border border-white/30 px-4 py-1 rounded-full text-xs font-semibold hover:bg-white/25 transition-colors">
+                Payment Issues
+            </button>
+        </div>
     </div>
 </section>
 
-<!--
-    Dropdown — JS will move this to <body> on DOMContentLoaded
-    (portal pattern). Keeps it in HTML near its trigger for
-    readability, but at runtime it lives at the root of <body>.
--->
-<div id="concern-dropdown">
-    <div class="concern-option" onclick="selectConcern('All Topics','help_center')">
-        <span class="mat-icon">help_center</span> All Topics
-    </div>
-    <div class="concern-option" onclick="selectConcern('Cancellations &amp; Refunds','event_busy')">
-        <span class="mat-icon">event_busy</span> Cancellations &amp; Refunds
-    </div>
-    <div class="concern-option" onclick="selectConcern('Check-in Policies','key')">
-        <span class="mat-icon">key</span> Check-in Policies
-    </div>
-    <div class="concern-option" onclick="selectConcern('Payments &amp; Billing','payments')">
-        <span class="mat-icon">payments</span> Payments &amp; Billing
-    </div>
-    <div class="concern-option" onclick="selectConcern('Room &amp; Amenities','bed')">
-        <span class="mat-icon">bed</span> Room &amp; Amenities
-    </div>
-    <div class="concern-option" onclick="selectConcern('Wi-Fi &amp; Technical','wifi')">
-        <span class="mat-icon">wifi</span> Wi-Fi &amp; Technical
-    </div>
-    <div class="concern-option" onclick="selectConcern('Booking Modifications','edit_calendar')">
-        <span class="mat-icon">edit_calendar</span> Booking Modifications
-    </div>
-    <div class="concern-option" onclick="selectConcern('Other Concerns','support_agent')">
-        <span class="mat-icon">support_agent</span> Other Concerns
-    </div>
-</div>
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8 pb-8">
 
-<!-- ═══════════════════════════════════════════════
-     MAIN CONTENT
-═══════════════════════════════════════════════ -->
-<div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter mt-xl pb-xl">
+    <!-- FAQ + Support Requests -->
+    <div class="lg:col-span-8 space-y-6">
+        <h2 class="font-headline-lg text-headline-lg text-primary">Frequently Asked Questions</h2>
 
-    <!-- ── Left Column ── -->
-    <div class="lg:col-span-8 space-y-lg">
-
-        <h2 class="text-headline-md font-headline-md text-primary">Frequently Asked Questions</h2>
-
-        <div class="space-y-sm">
-
-            <!-- FAQ 1 — open by default -->
-            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden active">
-                <button type="button"
-                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
-                        onclick="toggleAccordion(this)">
-                    <div class="flex items-center gap-md">
-                        <span class="material-symbols-outlined text-primary">event_busy</span>
+        <div class="space-y-3">
+            <!-- FAQ 1 -->
+            <div class="accordion-item active bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">event_busy</span>
                         <span class="font-headline-sm text-headline-sm">Cancellations &amp; Refunds</span>
                     </div>
-                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
                 </button>
                 <div class="accordion-content border-t border-outline-variant/20">
-                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
-                        Guests may cancel most bookings up to <strong>24 hours before the scheduled check-in date</strong> to receive a full refund.
-                        Refunds are processed within <strong>5–7 business days</strong>, subject to your bank's processing schedule.
-                        Non-refundable reservations are not eligible for automatic refunds; however, guests experiencing exceptional
-                        circumstances are encouraged to contact our support team directly for case-by-case review.
-                        All cancellation requests must be submitted through your Bookings dashboard or via our support channels.
+                    <div class="p-6 space-y-4">
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Guests may cancel most bookings up to <strong class="text-on-surface">24 hours before check-in</strong>
+                            for a full refund. Refunds process within <strong class="text-on-surface">5–7 business days</strong>.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                                <p class="font-bold text-sm text-green-800 mb-1">✅ Full Refund Eligible</p>
+                                <p class="text-sm text-green-700">Cancelled 24+ hours before check-in on a flexible rate.</p>
+                            </div>
+                            <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                                <p class="font-bold text-sm text-red-800 mb-1">❌ Non-Refundable</p>
+                                <p class="text-sm text-red-700">Non-refundable bookings or cancellations within 24 hours.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- FAQ 2 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <button type="button"
-                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
-                        onclick="toggleAccordion(this)">
-                    <div class="flex items-center gap-md">
-                        <span class="material-symbols-outlined text-primary">key</span>
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">key</span>
                         <span class="font-headline-sm text-headline-sm">Check-in Policies</span>
                     </div>
-                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
                 </button>
                 <div class="accordion-content border-t border-outline-variant/20">
-                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
-                        Standard check-in time is <strong>3:00 PM</strong> and check-out is at <strong>12:00 PM (noon)</strong>.
-                        Early check-in requests are subject to room availability and may be subject to an additional fee at the property's discretion.
-                        All guests are required to present a <strong>valid government-issued photo ID</strong> and the
-                        <strong>original credit or debit card</strong> used at the time of booking upon arrival.
-                        Failure to provide these documents may result in denial of check-in without a refund.
-                        Late check-out arrangements must be requested no later than 9:00 AM on the day of departure.
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">login</span>
+                                <p class="font-bold text-sm">Check-in</p>
+                                <p class="font-headline-sm text-headline-sm text-primary">3:00 PM</p>
+                            </div>
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">logout</span>
+                                <p class="font-bold text-sm">Check-out</p>
+                                <p class="font-headline-sm text-headline-sm text-primary">12:00 PM</p>
+                            </div>
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">smartphone</span>
+                                <p class="font-bold text-sm">Online</p>
+                                <p class="font-headline-sm text-headline-sm text-primary">24 hrs</p>
+                            </div>
+                        </div>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            All guests must present a <strong class="text-on-surface">valid government-issued photo ID</strong>
+                            and the <strong class="text-on-surface">original payment card</strong> used at booking.
+                        </p>
                     </div>
                 </div>
             </div>
 
             <!-- FAQ 3 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <button type="button"
-                        class="w-full px-lg py-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
-                        onclick="toggleAccordion(this)">
-                    <div class="flex items-center gap-md">
-                        <span class="material-symbols-outlined text-primary">payments</span>
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">payments</span>
                         <span class="font-headline-sm text-headline-sm">Payments &amp; Billing</span>
                     </div>
-                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
                 </button>
                 <div class="accordion-content border-t border-outline-variant/20">
-                    <div class="p-lg text-body-md text-on-surface-variant leading-relaxed">
-                        StayWithMeh accepts all major <strong>credit and debit cards</strong> (Visa, Mastercard, American Express),
-                        as well as select <strong>digital wallets</strong> and local payment methods where available.
-                        Full payment is charged at the time of booking confirmation.
-                        An official <strong>invoice or receipt</strong> is automatically generated and delivered to your registered
-                        email address upon successful payment.
-                        For guests requiring corporate billing arrangements or official receipts for reimbursement purposes,
-                        please contact our finance support team with your booking reference number and company details.
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">credit_card</span>
+                                <p class="font-bold text-xs">Credit / Debit</p>
+                                <p class="text-sm text-on-surface-variant">Visa, MC, Amex</p>
+                            </div>
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">payments</span>
+                                <p class="font-bold text-xs">Cash</p>
+                                <p class="text-sm text-on-surface-variant">Front desk only</p>
+                            </div>
+                            <div class="bg-surface-container p-4 rounded-xl">
+                                <span class="material-symbols-outlined text-primary text-[28px] mb-1 block">receipt_long</span>
+                                <p class="font-bold text-xs">Bank Transfer</p>
+                                <p class="text-sm text-on-surface-variant">Corporate only</p>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <p class="font-bold text-sm text-amber-800 mb-1 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">info</span> Security Deposit
+                            </p>
+                            <p class="text-sm text-amber-700">
+                                A hold of <strong>$150–$300</strong> is placed at check-in and released within <strong>3–5 business days</strong> after checkout.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- FAQ 4 -->
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">wifi</span>
+                        <span class="font-headline-sm text-headline-sm">Wi-Fi &amp; Technical</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-6">
+                        <p class="text-body-md text-on-surface-variant mb-4">
+                            Complimentary high-speed Wi-Fi up to <strong class="text-on-surface">300 Mbps</strong> at no charge.
+                        </p>
+                        <div class="bg-surface-container rounded-xl p-4 text-sm text-on-surface-variant space-y-1">
+                            <p class="font-bold text-sm text-on-surface mb-2">Connection Instructions:</p>
+                            <p>1. Connect to: <strong class="text-primary">StayWithMeh_Guest</strong></p>
+                            <p>2. Enter your room number + last name in the browser</p>
+                            <p>3. Issues? Dial <strong>extension 0</strong> or visit the front desk</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-            
-        <!-- Your Support Requests -->
-        <div class="mt-xl">
-            <h2 class="text-headline-md font-headline-md text-primary mb-lg">Your Support Requests</h2>
+
+        <!-- Support Requests Empty -->
+        <div class="mt-8">
+            <h2 class="font-headline-lg text-headline-lg text-primary mb-6">Your Support Requests</h2>
             <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
                 <div class="empty-state">
-                    <div class="icon-wrap">
-                        <span class="material-symbols-outlined">inbox</span>
+                    <div class="empty-icon-wrap">
+                        <span class="material-symbols-outlined text-outline" style="font-size:36px">inbox</span>
                     </div>
-                    <h3 class="text-headline-sm font-headline-sm text-on-surface mb-xs">No support requests yet</h3>
-                    <p class="text-body-sm text-on-surface-variant max-w-sm">
-                        You haven't submitted any support requests. If you need assistance, use the search above
-                        or reach out through Live Chat or Email Support.
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">No support requests yet</h3>
+                    <p class="text-sm text-on-surface-variant max-w-sm">
+                        You haven't submitted any support requests. Use Live Chat or Email Support if you need help.
                     </p>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- ── Right Column ── -->
-    <div class="lg:col-span-4 space-y-lg">
-        <h2 class="text-headline-md font-headline-md text-primary">Need more help?</h2>
-        <div class="space-y-md">
+    <!-- Right Sidebar -->
+    <div class="lg:col-span-4 space-y-6">
+        <h2 class="font-headline-lg text-headline-lg text-primary">Need more help?</h2>
 
-            <!-- Live Chat -->
-            <div class="bg-primary text-on-primary p-lg rounded-xl shadow-lg group cursor-pointer hover:bg-primary-container transition-all">
-                <div class="flex items-center gap-md mb-md">
-                    <div class="w-12 h-12 bg-on-primary/10 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[28px]">chat</span>
-                    </div>
-                    <div>
-                        <h4 class="text-headline-sm font-headline-sm">Live Chat</h4>
-                        <p class="text-label-sm font-label-sm opacity-80">Wait time: &lt; 2 mins</p>
-                    </div>
+        <div class="bg-primary text-on-primary p-6 rounded-xl shadow-lg">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[28px]">chat</span>
                 </div>
-                <p class="text-body-sm mb-lg">Chat with our dedicated support agents in real-time for immediate assistance.</p>
-                <button type="button" class="w-full py-md bg-on-primary text-primary font-bold rounded-lg group-hover:scale-[1.02] transition-transform">
-                    Start Conversation
-                </button>
-            </div>
-
-            <!-- Email Support -->
-            <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:border-primary/50 transition-all cursor-pointer">
-                <div class="flex items-center gap-md mb-md">
-                    <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
-                        <span class="material-symbols-outlined text-[28px]">mail</span>
-                    </div>
-                    <div>
-                        <h4 class="text-headline-sm font-headline-sm text-on-surface">Email Support</h4>
-                        <p class="text-label-sm font-label-sm text-on-surface-variant">Response in 24 hours</p>
-                    </div>
-                </div>
-                <p class="text-body-sm text-on-surface-variant mb-lg">For complex inquiries or formal requests, please send us a detailed email.</p>
-                <button type="button" class="w-full py-md border-2 border-primary text-primary font-bold rounded-lg hover:bg-primary/5 transition-all">
-                    Submit a Ticket
-                </button>
-            </div>
-
-            <!-- 24/7 Banner -->
-            <div class="rounded-xl overflow-hidden relative h-48 group">
-                <img
-                    alt="Customer Service Agent"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6VvdULEtn7ktNaTH7L_R-N48akjdjC13SgbRCDzIlJI4z0TW75dH3q44J7FeCwxsf6lc71orvT3aHYqwxJuOgWq-ZytiOJJcBObOII7W5_Rp0R0Q3hYjOEyDbBMZgBFMOIDVNi5Q3z9jyhaBBxpOILdFdFOvaBGpWSn9Q_ID-Tl8X2luaUUk-lmjOeXMtLQ9ttdfkeD-bXghna6eYOrk9pQAqz62gxuKZb1YYtYfekGJqpU096wABI-U7LmPWm3lFZgrFL4c61qDz" />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-md">
-                    <p class="text-on-primary text-label-sm font-label-sm">StayWithMeh Care</p>
-                    <h5 class="text-on-primary font-headline-sm">24/7 Global Assistance</h5>
+                <div>
+                    <h4 class="font-headline-sm text-headline-sm">Live Chat</h4>
+                    <p class="text-xs opacity-80">Wait time: &lt; 2 mins</p>
                 </div>
             </div>
+            <p class="text-sm mb-6 opacity-90">Chat with support agents in real-time for immediate assistance.</p>
+            <button class="w-full py-4 bg-white text-primary font-bold rounded-lg hover:bg-surface-container transition-colors">
+                Start Conversation
+            </button>
+        </div>
 
+        <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-[28px]">mail</span>
+                </div>
+                <div>
+                    <h4 class="font-headline-sm text-headline-sm text-on-surface">Email Support</h4>
+                    <p class="text-xs text-on-surface-variant">Response in 24 hours</p>
+                </div>
+            </div>
+            <p class="text-sm text-on-surface-variant mb-6">For complex inquiries or formal requests.</p>
+            <button class="w-full py-4 border-2 border-primary text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors">
+                Submit a Ticket
+            </button>
+        </div>
+
+        <div class="rounded-xl overflow-hidden relative h-48 group">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                 src="~/images/customer_support_center/CustomerSupport.png" alt="StayWithMeh Care Agent" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <p class="text-white text-xs opacity-80">StayWithMeh Care</p>
+                <h5 class="text-white font-headline-sm">24/7 Global Assistance</h5>
+            </div>
+        </div>
+
+        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-sm p-6 space-y-4">
+            <h3 class="font-headline-sm text-headline-sm text-primary">Direct Contact</h3>
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">call</span>
+                <div>
+                    <p class="font-bold text-sm text-on-surface">Phone</p>
+                    <p class="text-sm text-on-surface-variant">+1 (800) 789-STAY</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">mail</span>
+                <div>
+                    <p class="font-bold text-sm text-on-surface">Email</p>
+                    <p class="text-sm text-on-surface-variant">support&#64;staywithmeh.com</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">schedule</span>
+                <div>
+                    <p class="font-bold text-sm text-on-surface">Hours</p>
+                    <p class="text-sm text-on-surface-variant">24 hours, 7 days a week</p>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 @section Scripts {
 <script>
-    // ════════════════════════════════════════════════════════
-    // PORTAL — move dropdown to <body> so it can never be
-    // clipped or buried by any ancestor stacking context.
-    // ════════════════════════════════════════════════════════
-    document.addEventListener('DOMContentLoaded', function () {
-        const dd = document.getElementById('concern-dropdown');
-        if (dd && dd.parentElement !== document.body) {
-            document.body.appendChild(dd);
-        }
-    });
+// ════════════════════════════════════════════════════════════
+//  DROPDOWN — the element lives in the DOM permanently but is
+//  re-appended as the LAST child of <body> every time it opens.
+//  This guarantees it is always the topmost painted element,
+//  regardless of what stacking contexts exist on the page.
+// ════════════════════════════════════════════════════════════
 
-    // ── Position helper ──────────────────────────────────────
-    function positionDropdown() {
-        const anchor = document.getElementById('search-container');
-        const dd     = document.getElementById('concern-dropdown');
-        if (!anchor || !dd) return;
-        const rect       = anchor.getBoundingClientRect();
-        dd.style.top     = (rect.bottom + 8) + 'px';
-        dd.style.left    = rect.left + 'px';
-        dd.style.width   = rect.width + 'px';
-        dd.style.maxHeight = (window.innerHeight - rect.bottom - 16) + 'px';
-        dd.style.overflowY = 'auto';
-    }
+var DD_OPTIONS = [
+    { label: 'All Topics',               icon: 'help_center'    },
+    { label: 'Cancellations & Refunds',  icon: 'event_busy'     },
+    { label: 'Check-in Policies',        icon: 'key'            },
+    { label: 'Payments & Billing',       icon: 'payments'       },
+    { label: 'Room & Amenities',         icon: 'bed'            },
+    { label: 'Wi-Fi & Technical',        icon: 'wifi'           },
+    { label: 'Booking Modifications',    icon: 'edit_calendar'  },
+    { label: 'Other Concerns',           icon: 'support_agent'  }
+];
 
-    // ── Toggle ───────────────────────────────────────────────
-    function toggleConcernDropdown(e) {
-        e.stopPropagation();
-        const dd    = document.getElementById('concern-dropdown');
-        const arrow = document.getElementById('concern-arrow');
-        if (!dd.classList.contains('open')) {
-            positionDropdown();
-            dd.classList.add('open');
-            arrow.style.transform = 'rotate(180deg)';
-        } else {
-            dd.classList.remove('open');
-            arrow.style.transform = 'rotate(0deg)';
-        }
-    }
+// Build the dropdown element once
+var _dd = (function() {
+    var el = document.createElement('div');
+    el.id  = 'swm-dd';
 
-    // ── Select option ────────────────────────────────────────
-    function selectConcern(label, icon) {
-        document.getElementById('concern-label').textContent = label;
-        document.getElementById('concern-icon').textContent  = icon;
-        document.getElementById('concern-dropdown').classList.remove('open');
-        document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
-        document.getElementById('support-search').focus();
-    }
+    DD_OPTIONS.forEach(function(opt) {
+        var row = document.createElement('div');
+        row.className = 'dd-row';
 
-    // ── Close on outside click ───────────────────────────────
-    document.addEventListener('click', function (e) {
-        const toggle = document.getElementById('concern-toggle');
-        const dd     = document.getElementById('concern-dropdown');
-        if (!toggle || !dd) return;
-        if (!toggle.contains(e.target) && !dd.contains(e.target)) {
-            dd.classList.remove('open');
-            document.getElementById('concern-arrow').style.transform = 'rotate(0deg)';
-        }
-    });
+        var icon = document.createElement('span');
+        icon.className   = 'dd-icon material-symbols-outlined';
+        icon.textContent = opt.icon;
 
-    // ── Reposition on scroll / resize ───────────────────────
-    window.addEventListener('scroll', function () {
-        if (document.getElementById('concern-dropdown').classList.contains('open')) positionDropdown();
-    }, { passive: true });
+        var txt = document.createTextNode(opt.label);
 
-    window.addEventListener('resize', function () {
-        if (document.getElementById('concern-dropdown').classList.contains('open')) positionDropdown();
-    });
-
-    // ── Accordion ────────────────────────────────────────────
-    function toggleAccordion(btn) {
-        const parent = btn.closest('.accordion-item');
-        document.querySelectorAll('.accordion-item').forEach(item => {
-            if (item !== parent) item.classList.remove('active');
+        row.appendChild(icon);
+        row.appendChild(txt);
+        row.addEventListener('click', function(e) {
+            e.stopPropagation();
+            ddSelect(opt.label, opt.icon);
         });
-        parent.classList.toggle('active');
-    }
+        el.appendChild(row);
+    });
+
+    // Initially hidden, not yet in DOM
+    el.style.display = 'none';
+    return el;
+})();
+
+function ddPosition() {
+    var toggle = document.getElementById('concern-toggle');
+    if (!toggle) return;
+    var r = toggle.getBoundingClientRect();
+    _dd.style.top  = (r.bottom + 6) + 'px';
+    _dd.style.left = r.left + 'px';
+}
+
+function ddOpen() {
+    // KEY FIX: re-append as last child every open → always on top
+    document.body.appendChild(_dd);
+    ddPosition();
+    _dd.style.display = 'block';
+    document.getElementById('concern-arrow').style.transform = 'rotate(180deg)';
+}
+
+function ddClose() {
+    _dd.style.display = 'none';
+    var arrow = document.getElementById('concern-arrow');
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+}
+
+function ddToggle(e) {
+    e.stopPropagation();
+    _dd.style.display === 'none' ? ddOpen() : ddClose()
+}
+
+function ddSelect(label, icon) {
+    var lbl = document.getElementById('concern-label');
+    var ico = document.getElementById('concern-icon');
+    if (lbl) lbl.textContent = label;
+    if (ico) ico.textContent = icon;
+    ddClose();
+    var inp = document.getElementById('support-search');
+    if (inp) inp.focus();
+}
+
+function ddQuick(label, icon) {
+    var lbl = document.getElementById('concern-label');
+    var ico = document.getElementById('concern-icon');
+    if (lbl) lbl.textContent = label;
+    if (ico) ico.textContent = icon;
+    var inp = document.getElementById('support-search');
+    if (inp) inp.focus();
+}
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+    if (_dd.style.display === 'none') return;
+    var toggle = document.getElementById('concern-toggle');
+    if (toggle && toggle.contains(e.target)) return;
+    if (_dd.contains(e.target)) return;
+    ddClose();
+});
+
+// Reposition on scroll/resize
+window.addEventListener('scroll', function() {
+    if (_dd.style.display !== 'none') ddPosition();
+}, { passive: true });
+window.addEventListener('resize', function() {
+    if (_dd.style.display !== 'none') ddPosition();
+});
+
+// ── FAQ Accordion ──
+function toggleAccordion(btn) {
+    var item     = btn.closest('.accordion-item');
+    var isActive = item.classList.contains('active');
+    document.querySelectorAll('.accordion-item').forEach(function(i) {
+        i.classList.remove('active');
+    });
+    if (!isActive) item.classList.add('active');
+}
 </script>
 }
