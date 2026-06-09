@@ -114,7 +114,9 @@
         </div>
     </div>
 
-    <div id="destinationScroll" class="flex gap-8 overflow-x-auto no-scrollbar pb-6">
+    <!-- Carousel wrapper — clips the track -->
+    <div class="relative overflow-hidden pb-6" id="carouselViewport">
+        <div id="destinationScroll" class="flex gap-8" style="will-change: transform;">
 
         <!-- ── New York ── -->
         <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
@@ -274,9 +276,8 @@
                 <span class="text-label-md font-semibold text-on-surface">920 Properties</span>
                 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
             </div>
-        </div>
-
-    </div>
+        </div><!-- /#destinationScroll track -->
+    </div><!-- /#carouselViewport -->
 
     <!-- Active branch indicator -->
     <div id="activeBranchBar"
@@ -587,12 +588,102 @@
     const pd = document.getElementById('priceDisplay');
     pr?.addEventListener('input', () => pd.textContent = '$' + pr.value);
 
-    // ── Destination scroll buttons ──
-    const sc = document.getElementById('destinationScroll');
-    document.getElementById('scrollLeft')?.addEventListener('click',
-        () => sc.scrollBy({ left: -300, behavior: 'smooth' }));
-    document.getElementById('scrollRight')?.addEventListener('click',
-        () => sc.scrollBy({ left:  300, behavior: 'smooth' }));
+    // ══════════════════════════════════════════════════
+    // INFINITE LOOP CAROUSEL — measures real DOM widths
+    // ══════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const track  = document.getElementById('destinationScroll');
+        const btnL   = document.getElementById('scrollLeft');
+        const btnR   = document.getElementById('scrollRight');
+
+        if (!track || !btnL || !btnR) return;
+
+        const SPEED = 420; // ms
+
+        // ── 1. Measure one real card's full step width ──
+        // Must happen after layout so we get the real pixel value.
+        function getStep() {
+            const first = track.querySelector('.destination-card');
+            if (!first) return 292;
+            const style  = getComputedStyle(track);
+            const gap    = parseFloat(style.gap || style.columnGap || '32');
+            return first.getBoundingClientRect().width + gap;
+        }
+
+        // ── 2. Clone buffer: 3 clones before + 3 after ──
+        const realCards = Array.from(track.querySelectorAll('.destination-card'));
+        const total     = realCards.length;
+
+        realCards.slice(-3).reverse().forEach(c => {
+            const cl = c.cloneNode(true);
+            cl.setAttribute('aria-hidden', 'true');
+            cl.querySelectorAll('[onclick]').forEach(el => el.removeAttribute('onclick'));
+            track.prepend(cl);
+        });
+        realCards.slice(0, 3).forEach(c => {
+            const cl = c.cloneNode(true);
+            cl.setAttribute('aria-hidden', 'true');
+            cl.querySelectorAll('[onclick]').forEach(el => el.removeAttribute('onclick'));
+            track.appendChild(cl);
+        });
+
+        // ── 3. State — start at first real card (index 3) ──
+        let idx         = 3;
+        let locked      = false;
+
+        function goTo(i, animate) {
+            const step = getStep();
+            track.style.transition = animate
+                ? 'transform ' + SPEED + 'ms cubic-bezier(0.4,0,0.2,1)'
+                : 'none';
+            track.style.transform  = 'translateX(-' + (i * step) + 'px)';
+        }
+
+        // Init position (no animation)
+        // Use requestAnimationFrame to ensure layout is complete
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => { goTo(idx, false); });
+        });
+
+        // ── 4. After animation — silent snap if on a clone ──
+        track.addEventListener('transitionend', function () {
+            const clonesBefore = 3;
+            const lastRealIdx  = clonesBefore + total - 1;
+
+            if (idx >= lastRealIdx + 1) {
+                idx = clonesBefore;
+                goTo(idx, false);
+            } else if (idx <= clonesBefore - 1) {
+                idx = lastRealIdx;
+                goTo(idx, false);
+            }
+            locked = false;
+        });
+
+        // ── 5. Button handlers ──
+        btnR.addEventListener('click', function () {
+            if (locked) return;
+            locked = true;
+            idx++;
+            goTo(idx, true);
+        });
+
+        btnL.addEventListener('click', function () {
+            if (locked) return;
+            locked = true;
+            idx--;
+            goTo(idx, true);
+        });
+
+        // ── 6. Re-attach filterByCity to cloned cards ──
+        track.addEventListener('click', function (e) {
+            const card = e.target.closest('.destination-card');
+            if (!card || card.getAttribute('aria-hidden') === 'true') return;
+            filterByCity(card.dataset.city, card);
+        });
+
+    }); // end DOMContentLoaded
 
     // ── Grid / List toggle ──
     document.getElementById('gridBtn')?.addEventListener('click', () => {
