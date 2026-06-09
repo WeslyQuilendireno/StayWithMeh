@@ -21,7 +21,8 @@
                     <span class="text-[10px] uppercase tracking-wider font-bold text-outline">Destination</span>
                     <input class="border-none p-0 focus:ring-0 text-body-md w-full bg-transparent placeholder-on-surface-variant"
                            placeholder="Enter city, area or property name"
-                           type="text" name="destination" value="@ViewData["Destination"]" />
+                           type="text" name="destination" value="@ViewData["Destination"]"
+                           id="destinationInput" autocomplete="off" />
                 </div>
             </div>
 
@@ -91,13 +92,13 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     POPULAR DESTINATIONS — Rectangle Cards
+     POPULAR DESTINATIONS
 ═══════════════════════════════════════════════ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex justify-between items-end mb-lg">
         <div>
-            <h2 class="font-headline-lg text-headline-lg text-primary">Popular Destinations</h2>
-            <p class="text-on-surface-variant font-body-sm mt-xs">Curated trips based on your preferences</p>
+            <h2 class="font-headline-lg text-headline-lg text-primary">Our 8 Global Branches</h2>
+            <p class="text-on-surface-variant font-body-sm mt-xs">Click any branch to filter rooms by location</p>
         </div>
         <div class="flex gap-2">
             <button id="scrollLeft"
@@ -113,20 +114,21 @@
         </div>
     </div>
 
-    <!-- Rectangle destination cards with generous gap -->
     <div id="destinationScroll" class="flex gap-8 overflow-x-auto no-scrollbar pb-6">
 
-        @* ── New York ── *@
-        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
-            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+        <!-- ── New York ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="New York" onclick="filterByCity('New York', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
                             transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/newyorkUS.jpg" alt="New York" />
                 <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
                             flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">New York</h3>
-                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United States</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United States 🇺🇸</p>
                 </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
             </div>
             <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">1,240 Properties</span>
@@ -134,17 +136,19 @@
             </div>
         </div>
 
-        @* ── London ── *@
-        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
-            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+        <!-- ── London ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="London" onclick="filterByCity('London', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
                             transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/londonUK.jpg" alt="London" />
                 <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
                             flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">London</h3>
-                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Kingdom</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Kingdom 🇬🇧</p>
                 </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
             </div>
             <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">890 Properties</span>
@@ -152,17 +156,19 @@
             </div>
         </div>
 
-        @* ── Tokyo ── *@
-        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
-            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+        <!-- ── Tokyo ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Tokyo" onclick="filterByCity('Tokyo', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
                             transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/tokyoJP.jpg" alt="Tokyo" />
                 <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
                             flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">Tokyo</h3>
-                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Japan</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Japan 🇯🇵</p>
                 </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
             </div>
             <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">2,150 Properties</span>
@@ -170,17 +176,19 @@
             </div>
         </div>
 
-        @* ── Dubai ── *@
-        <div class="min-w-[300px] max-w-[300px] flex-shrink-0 group cursor-pointer">
-            <div class="relative h-[340px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+        <!-- ── Dubai ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Dubai" onclick="filterByCity('Dubai', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
                 <img class="w-full h-full object-cover object-center
                             transition-transform duration-500 group-hover:scale-105"
                      src="~/images/explore_page/dubaiUAE.jpg" alt="Dubai" />
                 <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
                             flex flex-col justify-end p-6">
                     <h3 class="text-white font-headline-md text-headline-md">Dubai</h3>
-                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Arab Emirates</p>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Arab Emirates 🇦🇪</p>
                 </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
             </div>
             <div class="flex justify-between items-center px-1">
                 <span class="text-label-md font-semibold text-on-surface">1,020 Properties</span>
@@ -188,11 +196,108 @@
             </div>
         </div>
 
+        <!-- ── Caracas ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Caracas" onclick="filterByCity('Caracas', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/explore_page/caracasVEN.jpg" alt="Caracas" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
+                    <h3 class="text-white font-headline-md text-headline-md">Caracas</h3>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Venezuela 🇻🇪</p>
+                </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <span class="text-label-md font-semibold text-on-surface">340 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        <!-- ── Addis Ababa ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Addis Ababa" onclick="filterByCity('Addis Ababa', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/explore_page/addisAbabaETH.jpg" alt="Addis Ababa" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
+                    <h3 class="text-white font-headline-md text-headline-md">Addis Ababa</h3>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Ethiopia 🇪🇹</p>
+                </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <span class="text-label-md font-semibold text-on-surface">280 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        <!-- ── Melbourne ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Melbourne" onclick="filterByCity('Melbourne', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/explore_page/melbourneAUS.jpg" alt="Melbourne" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
+                    <h3 class="text-white font-headline-md text-headline-md">Melbourne</h3>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Australia 🇦🇺</p>
+                </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <span class="text-label-md font-semibold text-on-surface">760 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+        <!-- ── Singapore ── -->
+        <div class="min-w-[260px] max-w-[260px] flex-shrink-0 group cursor-pointer destination-card"
+             data-city="Singapore" onclick="filterByCity('Singapore', this)">
+            <div class="relative h-[320px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img class="w-full h-full object-cover object-center
+                            transition-transform duration-500 group-hover:scale-105"
+                     src="~/images/explore_page/MarinaBaySG.jpg" alt="Singapore" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent
+                            flex flex-col justify-end p-6">
+                    <h3 class="text-white font-headline-md text-headline-md">Singapore</h3>
+                    <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Singapore 🇸🇬</p>
+                </div>
+                <div class="branch-active-ring absolute inset-0 rounded-2xl border-2 border-primary opacity-0 transition-opacity pointer-events-none"></div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <span class="text-label-md font-semibold text-on-surface">920 Properties</span>
+                <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Active branch indicator -->
+    <div id="activeBranchBar"
+         class="hidden mt-xs flex items-center justify-between bg-primary/5 border border-primary/20
+                rounded-xl px-lg py-sm">
+        <div class="flex items-center gap-sm">
+            <span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+            <span class="text-body-sm text-on-surface">Showing rooms for
+                <strong id="activeBranchName" class="text-primary"></strong>
+            </span>
+        </div>
+        <button onclick="clearBranchFilter()"
+                class="text-label-sm text-on-surface-variant hover:text-primary transition-colors
+                       flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[16px]">close</span> Clear filter
+        </button>
     </div>
 </section>
 
 <!-- ═══════════════════════════════════════════════
-     AVAILABLE ROOMS — with your own photos
+     AVAILABLE ROOMS
 ═══════════════════════════════════════════════ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
@@ -221,7 +326,7 @@
 
     <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
 
-        <!-- ── Skyline Executive Suite ── -->
+        <!-- Skyline Executive Suite -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
             <div class="relative h-64 overflow-hidden">
@@ -281,7 +386,7 @@
             </div>
         </div>
 
-        <!-- ── Urban Deluxe King ── -->
+        <!-- Urban Deluxe King -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
             <div class="relative h-64 overflow-hidden">
@@ -337,7 +442,7 @@
             </div>
         </div>
 
-        <!-- ── Grand Family Loft — Fully Booked ── -->
+        <!-- Grand Family Loft — Fully Booked -->
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
                     overflow-hidden flex flex-col group hover:shadow-md transition-all">
             <div class="relative h-64 overflow-hidden">
@@ -389,7 +494,6 @@
      FLASH OFFER + OPERATIONAL STANDARDS
 ═══════════════════════════════════════════════ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-lg">
-
     <div class="bg-primary-container p-xl rounded-3xl relative overflow-hidden">
         <div class="relative z-10">
             <span class="bg-white/20 text-white px-3 py-1 rounded-full text-[10px] font-bold
@@ -406,7 +510,6 @@
             corporate_fare
         </span>
     </div>
-
     <div class="bg-surface-container p-xl rounded-3xl border border-outline-variant/30">
         <h2 class="font-headline-lg text-headline-lg text-primary mb-lg">Operational Standards</h2>
         <div class="grid grid-cols-2 gap-md">
@@ -455,7 +558,7 @@
             </div>
             <div>
                 <p class="font-bold text-headline-sm text-primary">Trusted by over 50,000 travelers</p>
-                <p class="text-on-surface-variant font-body-sm">Consistent 4.8/5 rating across all global platforms.</p>
+                <p class="text-on-surface-variant font-body-sm">Consistent 4.8/5 rating across all 8 global branches.</p>
             </div>
         </div>
         <div class="flex gap-4">
@@ -468,25 +571,72 @@
                 <p class="font-bold text-primary text-headline-md">24/7</p>
                 <p class="text-[10px] uppercase font-bold text-outline">Support</p>
             </div>
+            <div class="w-px h-10 bg-outline-variant"></div>
+            <div class="text-center">
+                <p class="font-bold text-primary text-headline-md">8</p>
+                <p class="text-[10px] uppercase font-bold text-outline">Branches</p>
+            </div>
         </div>
     </div>
 </section>
 
 @section Scripts {
 <script>
+    // ── Price range slider ──
     const pr = document.getElementById('priceRange');
     const pd = document.getElementById('priceDisplay');
     pr?.addEventListener('input', () => pd.textContent = '$' + pr.value);
 
+    // ── Destination scroll buttons ──
     const sc = document.getElementById('destinationScroll');
-    document.getElementById('scrollLeft')?.addEventListener('click',  () => sc.scrollBy({ left: -340, behavior: 'smooth' }));
-    document.getElementById('scrollRight')?.addEventListener('click', () => sc.scrollBy({ left:  340, behavior: 'smooth' }));
+    document.getElementById('scrollLeft')?.addEventListener('click',
+        () => sc.scrollBy({ left: -300, behavior: 'smooth' }));
+    document.getElementById('scrollRight')?.addEventListener('click',
+        () => sc.scrollBy({ left:  300, behavior: 'smooth' }));
 
+    // ── Grid / List toggle ──
     document.getElementById('gridBtn')?.addEventListener('click', () => {
         document.getElementById('roomsGrid').className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg';
     });
     document.getElementById('listBtn')?.addEventListener('click', () => {
         document.getElementById('roomsGrid').className = 'grid grid-cols-1 gap-lg';
     });
+
+    // ── Branch filter ──
+    let activeCity = null;
+
+    function filterByCity(city, cardEl) {
+        // Toggle off if same city clicked again
+        if (activeCity === city) { clearBranchFilter(); return; }
+
+        activeCity = city;
+
+        // Visual state on cards
+        document.querySelectorAll('.destination-card').forEach(c => {
+            const ring = c.querySelector('.branch-active-ring');
+            const isActive = c.dataset.city === city;
+            ring.style.opacity = isActive ? '1' : '0';
+            c.style.opacity    = isActive ? '1' : '0.5';
+        });
+
+        // Update destination input + show bar
+        document.getElementById('destinationInput').value = city;
+        const bar = document.getElementById('activeBranchBar');
+        document.getElementById('activeBranchName').textContent = city;
+        bar.classList.remove('hidden');
+
+        // TODO (Week 2): trigger Supabase room query filtered by property city
+        console.log('Filtering rooms for branch:', city);
+    }
+
+    function clearBranchFilter() {
+        activeCity = null;
+        document.querySelectorAll('.destination-card').forEach(c => {
+            c.querySelector('.branch-active-ring').style.opacity = '0';
+            c.style.opacity = '1';
+        });
+        document.getElementById('destinationInput').value = '';
+        document.getElementById('activeBranchBar').classList.add('hidden');
+    }
 </script>
 }
