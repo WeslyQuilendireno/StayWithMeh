@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"]      = "Support";
+    ViewData["Title"] = "Support";
     ViewData["ActivePage"] = "Support";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,7 +10,7 @@
         overflow: hidden;
         transition: max-height 0.4s ease-out;
     }
-    .accordion-item.active .accordion-content { max-height: 500px; }
+    .accordion-item.active .accordion-content { max-height: 600px; }
     .accordion-item.active .arrow-icon { transform: rotate(180deg); }
     .arrow-icon { transition: transform 0.3s ease; }
 
@@ -26,8 +26,6 @@
         margin-bottom: 20px;
     }
 
-    /* The dropdown itself, every property inline via JS,
-       but we also declare it here as a hard fallback  */
     #swm-dd {
         position: fixed !important;
         z-index: 99999 !important;
@@ -62,7 +60,6 @@
     }
 </style>
 
-<!-- ═══ HERO ═══ -->
 <section class="bg-primary py-16 px-gutter">
     <div class="max-w-[1440px] mx-auto text-center">
         <h1 class="text-white font-display-lg text-display-lg mb-md">How can we help you?</h1>
@@ -119,15 +116,13 @@
     </div>
 </section>
 
-<!-- ═══ MAIN CONTENT ═══ -->
 <div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8 pb-8">
 
-    <!-- FAQ + Support Requests -->
     <div class="lg:col-span-8 space-y-6">
         <h2 class="font-headline-lg text-headline-lg text-primary">Frequently Asked Questions</h2>
 
         <div class="space-y-3">
-            <!-- FAQ 1 -->
+
             <div class="accordion-item active bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
                 <button type="button" onclick="toggleAccordion(this)"
                         class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
@@ -140,24 +135,30 @@
                 <div class="accordion-content border-t border-outline-variant/20">
                     <div class="p-6 space-y-4">
                         <p class="text-body-md text-on-surface-variant leading-relaxed">
-                            Guests may cancel most bookings up to <strong class="text-on-surface">24 hours before check-in</strong>
-                            for a full refund. Refunds process within <strong class="text-on-surface">5–7 business days</strong>.
+                            Guests may cancel most bookings up to <strong class="text-on-surface">24 hours prior to the scheduled check-in date</strong>
+                            to receive a full refund. Refund amounts are credited back to the original payment method within
+                            <strong class="text-on-surface">5 to 7 business days</strong>, subject to your financial institution's processing schedule.
+                        </p>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Reservations booked under a non-refundable rate are not eligible for a refund under any standard circumstance.
+                            Guests who believe their situation warrants an exception — such as a documented medical emergency or force majeure —
+                            are encouraged to submit a formal request through our support channels for individual review.
+                            All cancellation requests must be submitted through your Bookings dashboard or by contacting our support team directly.
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-                                <p class="font-bold text-sm text-green-800 mb-1">✅ Full Refund Eligible</p>
-                                <p class="text-sm text-green-700">Cancelled 24+ hours before check-in on a flexible rate.</p>
+                                <p class="font-bold text-sm text-green-800 mb-1">Full Refund Eligible</p>
+                                <p class="text-sm text-green-700">Cancellation submitted more than 24 hours before check-in on a flexible rate booking.</p>
                             </div>
                             <div class="bg-red-50 border border-red-200 rounded-xl p-4">
-                                <p class="font-bold text-sm text-red-800 mb-1">❌ Non-Refundable</p>
-                                <p class="text-sm text-red-700">Non-refundable bookings or cancellations within 24 hours.</p>
+                                <p class="font-bold text-sm text-red-800 mb-1">Non-Refundable</p>
+                                <p class="text-sm text-red-700">Bookings made under a non-refundable rate, or cancellations submitted within 24 hours of check-in.</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- FAQ 2 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
                 <button type="button" onclick="toggleAccordion(this)"
                         class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
@@ -187,14 +188,20 @@
                             </div>
                         </div>
                         <p class="text-body-md text-on-surface-variant leading-relaxed">
-                            All guests must present a <strong class="text-on-surface">valid government-issued photo ID</strong>
-                            and the <strong class="text-on-surface">original payment card</strong> used at booking.
+                            Standard check-in begins at <strong class="text-on-surface">3:00 PM</strong> and check-out is required by
+                            <strong class="text-on-surface">12:00 PM (noon)</strong>. Early check-in may be accommodated subject to room
+                            availability and may incur an additional fee at the property's discretion.
+                        </p>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            All guests are required to present a <strong class="text-on-surface">valid government-issued photo identification</strong>
+                            and the <strong class="text-on-surface">original credit or debit card</strong> used at the time of booking upon arrival at the front desk.
+                            Failure to provide the required documentation may result in denial of check-in without eligibility for a refund.
+                            Requests for late check-out must be made no later than 9:00 AM on the day of departure.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- FAQ 3 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
                 <button type="button" onclick="toggleAccordion(this)"
                         class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
@@ -223,19 +230,28 @@
                                 <p class="text-sm text-on-surface-variant">Corporate only</p>
                             </div>
                         </div>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            StayWithMeh accepts all major credit and debit cards including Visa, Mastercard, and American Express,
+                            as well as cash payments processed at the front desk. Full payment is collected at the time of booking confirmation.
+                            An official receipt is automatically issued to your registered email address upon successful payment.
+                        </p>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Guests requiring corporate billing arrangements or official invoices for reimbursement purposes should contact
+                            our finance support team with their booking reference number and company details prior to their stay.
+                        </p>
                         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
                             <p class="font-bold text-sm text-amber-800 mb-1 flex items-center gap-1">
                                 <span class="material-symbols-outlined text-[16px]">info</span> Security Deposit
                             </p>
                             <p class="text-sm text-amber-700">
-                                A hold of <strong>$150–$300</strong> is placed at check-in and released within <strong>3–5 business days</strong> after checkout.
+                                A temporary hold of <strong>$150 to $300</strong> is placed on the payment card at check-in and
+                                released within <strong>3 to 5 business days</strong> following checkout, subject to no damage or outstanding charges.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- FAQ 4 -->
             <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
                 <button type="button" onclick="toggleAccordion(this)"
                         class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
@@ -246,22 +262,73 @@
                     <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
                 </button>
                 <div class="accordion-content border-t border-outline-variant/20">
-                    <div class="p-6">
-                        <p class="text-body-md text-on-surface-variant mb-4">
-                            Complimentary high-speed Wi-Fi up to <strong class="text-on-surface">300 Mbps</strong> at no charge.
+                    <div class="p-6 space-y-4">
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Complimentary high-speed wireless internet access is available throughout the property at speeds of up to
+                            <strong class="text-on-surface">300 Mbps</strong>, provided at no additional charge to all registered guests.
+                            The network is secured and monitored to ensure a reliable and private connection during your stay.
                         </p>
-                        <div class="bg-surface-container rounded-xl p-4 text-sm text-on-surface-variant space-y-1">
-                            <p class="font-bold text-sm text-on-surface mb-2">Connection Instructions:</p>
-                            <p>1. Connect to: <strong class="text-primary">StayWithMeh_Guest</strong></p>
-                            <p>2. Enter your room number + last name in the browser</p>
-                            <p>3. Issues? Dial <strong>extension 0</strong> or visit the front desk</p>
+                        <div class="bg-surface-container rounded-xl p-4 text-sm text-on-surface-variant space-y-2">
+                            <p class="font-bold text-sm text-on-surface mb-1">Connection Instructions</p>
+                            <p>1. Select the network: <strong class="text-primary">StayWithMeh_Guest</strong></p>
+                            <p>2. Open a browser and enter your room number along with your last name when prompted.</p>
+                            <p>3. Should you encounter any connectivity issues, please dial <strong>extension 0</strong> from your in-room telephone or visit the front desk.</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">bed</span>
+                        <span class="font-headline-sm text-headline-sm">Room &amp; Amenities</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-6 space-y-4">
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            All guest rooms are serviced daily between <strong class="text-on-surface">9:00 AM and 3:00 PM</strong>.
+                            Should you prefer not to be disturbed, please display the Do Not Disturb sign on your door and our housekeeping team
+                            will schedule your service at a more convenient time upon request.
+                        </p>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Additional amenities including extra pillows, towels, toiletries, or room service may be requested at any time
+                            by contacting the front desk or dialing <strong class="text-on-surface">extension 1</strong> from your in-room telephone.
+                            Our team is available around the clock to assist with any in-room requirements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+                <button type="button" onclick="toggleAccordion(this)"
+                        class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">edit_calendar</span>
+                        <span class="font-headline-sm text-headline-sm">Booking Modifications</span>
+                    </div>
+                    <span class="material-symbols-outlined arrow-icon text-outline">expand_more</span>
+                </button>
+                <div class="accordion-content border-t border-outline-variant/20">
+                    <div class="p-6 space-y-4">
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Modifications to existing reservations — including changes to check-in or check-out dates, room type, or number of guests —
+                            may be requested through your Bookings dashboard or by contacting our support team directly.
+                        </p>
+                        <p class="text-body-md text-on-surface-variant leading-relaxed">
+                            All modification requests are subject to room availability at the time of the request and may result in a rate adjustment
+                            based on the prevailing pricing at the time of change. Modifications to non-refundable bookings may be limited and are
+                            reviewed on a case-by-case basis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Support Requests Empty -->
         <div class="mt-8">
             <h2 class="font-headline-lg text-headline-lg text-primary mb-6">Your Support Requests</h2>
             <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
@@ -278,7 +345,6 @@
         </div>
     </div>
 
-    <!-- Right Sidebar -->
     <div class="lg:col-span-4 space-y-6">
         <h2 class="font-headline-lg text-headline-lg text-primary">Need more help?</h2>
 
@@ -352,41 +418,31 @@
 
 @section Scripts {
 <script>
-// ════════════════════════════════════════════════════════════
-//  DROPDOWN — the element lives in the DOM permanently but is
-//  re-appended as the LAST child of <body> every time it opens.
-//  This guarantees it is always the topmost painted element,
-//  regardless of what stacking contexts exist on the page.
-// ════════════════════════════════════════════════════════════
-
 var DD_OPTIONS = [
-    { label: 'All Topics', icon: 'help_center'    },
-    { label: 'Cancellations & Refunds', icon: 'event_busy'     },
-    { label: 'Check-in Policies, icon: 'key'            },
-    { label: 'Payments & Billing, icon: 'payments'       },
-    { label: 'Room & Amenities, icon: 'bed'            },
-    { label: 'Wi-Fi & Technical, icon: 'wifi'           },
-    { label: 'Booking Modifications', icon: 'edit_calendar'  },
-    { label: 'Other Concerns', icon: 'support_agent'  }
+    { label: 'All Topics', icon: 'help_center' },
+    { label: 'Cancellations & Refunds', icon: 'event_busy' },
+    { label: 'Check-in Policies', icon: 'key' },
+    { label: 'Payments & Billing', icon: 'payments' },
+    { label: 'Room & Amenities', icon: 'bed' },
+    { label: 'Wi-Fi & Technical', icon: 'wifi' },
+    { label: 'Booking Modifications', icon: 'edit_calendar'},
+    { label: 'Other Concerns', icon: 'support_agent'}
 ];
 
-// Build the dropdown element once
 var _dd = (function() {
     var el = document.createElement('div');
-    el.id  = 'swm-dd';
+    el.id = 'swm-dd';
 
     DD_OPTIONS.forEach(function(opt) {
         var row = document.createElement('div');
         row.className = 'dd-row';
 
         var icon = document.createElement('span');
-        icon.className   = 'dd-icon material-symbols-outlined';
+        icon.className = 'dd-icon material-symbols-outlined';
         icon.textContent = opt.icon;
 
-        var txt = document.createTextNode(opt.label);
-
         row.appendChild(icon);
-        row.appendChild(txt);
+        row.appendChild(document.createTextNode(opt.label));
         row.addEventListener('click', function(e) {
             e.stopPropagation();
             ddSelect(opt.label, opt.icon);
@@ -394,7 +450,6 @@ var _dd = (function() {
         el.appendChild(row);
     });
 
-    // Initially hidden, not yet in DOM
     el.style.display = 'none';
     return el;
 })();
@@ -408,7 +463,6 @@ function ddPosition() {
 }
 
 function ddOpen() {
-    // KEY FIX: re-append as last child every open → always on top
     document.body.appendChild(_dd);
     ddPosition();
     _dd.style.display = 'block';
@@ -423,29 +477,22 @@ function ddClose() {
 
 function ddToggle(e) {
     e.stopPropagation();
-    _dd.style.display === 'none' ? ddOpen() : ddClose()
+    _dd.style.display === 'none' ? ddOpen() : ddClose();
 }
 
 function ddSelect(label, icon) {
-    var lbl = document.getElementById('concern-label');
-    var ico = document.getElementById('concern-icon');
-    if (lbl) lbl.textContent = label;
-    if (ico) ico.textContent = icon;
+    document.getElementById('concern-label').textContent = label;
+    document.getElementById('concern-icon').textContent  = icon;
     ddClose();
-    var inp = document.getElementById('support-search');
-    if (inp) inp.focus();
+    document.getElementById('support-search').focus();
 }
 
 function ddQuick(label, icon) {
-    var lbl = document.getElementById('concern-label');
-    var ico = document.getElementById('concern-icon');
-    if (lbl) lbl.textContent = label;
-    if (ico) ico.textContent = icon;
-    var inp = document.getElementById('support-search');
-    if (inp) inp.focus();
+    document.getElementById('concern-label').textContent = label;
+    document.getElementById('concern-icon').textContent  = icon;
+    document.getElementById('support-search').focus();
 }
 
-// Close on outside click
 document.addEventListener('click', function(e) {
     if (_dd.style.display === 'none') return;
     var toggle = document.getElementById('concern-toggle');
@@ -454,15 +501,14 @@ document.addEventListener('click', function(e) {
     ddClose();
 });
 
-// Reposition on scroll/resize
 window.addEventListener('scroll', function() {
     if (_dd.style.display !== 'none') ddPosition();
 }, { passive: true });
+
 window.addEventListener('resize', function() {
     if (_dd.style.display !== 'none') ddPosition();
 });
 
-// FAQ Accordion
 function toggleAccordion(btn) {
     var item     = btn.closest('.accordion-item');
     var isActive = item.classList.contains('active');
