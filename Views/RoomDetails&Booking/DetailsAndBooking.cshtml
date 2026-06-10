@@ -1,25 +1,25 @@
 @{
-    ViewData["Title"]      = "Room Details";
+    ViewData["Title"] = "Room Details";
     ViewData["ActivePage"] = "Rooms";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var roomId     = ViewData["RoomId"]    ?? 1;
-    var roomType   = ViewData["RoomType"]  ?? "Business Suite";
-    var roomNum    = ViewData["RoomNum"]   ?? "Room 402";
-    var floor      = ViewData["Floor"]     ?? "Executive Floor";
-    var priceNight = ViewData["Price"]     ?? "$285";
-    var basePrice  = ViewData["BasePrice"] ?? 250;
+    var roomId = ViewData["RoomId"] ?? 1;
+    var roomType = ViewData["RoomType"] ?? "Business Suite";
+    var roomNum = ViewData["RoomNum"] ?? "Room 402";
+    var floor = ViewData["Floor"] ?? "Executive Floor";
+    var priceNight = ViewData["Price"] ?? "$285";
+    var basePrice = ViewData["BasePrice"] ?? 250;
 }
 
 <style>
     #carousel-img { transition: opacity 0.25s ease; }
-    .thumb-item   { cursor: pointer; transition: all 0.15s; }
+    .thumb-item { cursor: pointer; transition: all 0.15s; }
     .thumb-item.active { outline: 2px solid #031635; outline-offset: 2px; }
     .amenity-card { transition: transform 0.15s, box-shadow 0.15s; }
     .amenity-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(3,22,53,0.10); }
-    .toggle-btn        { transition: background 0.2s; }
+    .toggle-btn { transition: background 0.2s; }
     .toggle-btn.active { background: #031635 !important; }
-    .toggle-btn span   { transition: transform 0.2s; }
+    .toggle-btn span { transition: transform 0.2s; }
     .booking-input { transition: border-color 0.15s, box-shadow 0.15s; }
     .booking-input:focus {
         outline: none;
@@ -74,7 +74,7 @@
             <div class="w-full h-[420px] md:h-[480px] rounded-xl overflow-hidden shadow-sm relative" id="carousel">
                 <img id="carousel-img"
                      class="w-full h-full object-cover"
-                     src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=1200"
+                     src="/images/rooms/BookingSampleImage/BookingSample1.avif"
                      alt="@roomType" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent flex items-end p-lg pointer-events-none">
                     <div>
@@ -97,16 +97,13 @@
             <!-- Thumbnails -->
             <div class="flex gap-md mt-md overflow-x-auto hide-scrollbar pb-1">
                 <div class="thumb-item active flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden" onclick="goToSlide(0)">
-                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=300" alt="View 1" />
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample1.avif" alt="View 1" />
                 </div>
                 <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(1)">
-                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=300" alt="View 2" />
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample2.avif" alt="View 2" />
                 </div>
                 <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(2)">
-                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=300" alt="View 3" />
-                </div>
-                <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(3)">
-                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&q=80&w=300" alt="View 4" />
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample3.avif" alt="View 3" />
                 </div>
             </div>
         </section>
@@ -355,10 +352,9 @@
 @section Scripts {
 <script>
     const slides = [
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&q=80&w=1200"
+        "/images/rooms/BookingSampleImage/BookingSample1.avif",
+        "/images/rooms/BookingSampleImage/BookingSample2.avif",
+        "/images/rooms/BookingSampleImage/BookingSample3.avif"
     ];
     let currentSlide = 0;
     const imgEl = document.getElementById('carousel-img');
@@ -368,8 +364,8 @@
         setTimeout(() => { imgEl.src = slides[currentSlide]; imgEl.style.opacity = '1'; }, 200);
         document.querySelectorAll('.thumb-item').forEach((t, i) => t.classList.toggle('active', i === currentSlide));
     }
-    function nextSlide()  { currentSlide = (currentSlide + 1) % slides.length; updateSlide(); }
-    function prevSlide()  { currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateSlide(); }
+    function nextSlide() { currentSlide = (currentSlide + 1) % slides.length; updateSlide(); }
+    function prevSlide() { currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateSlide(); }
     function goToSlide(i) { currentSlide = i; updateSlide(); }
 
     let guests = 2;
@@ -386,24 +382,24 @@
         if (!ci || !co) { summary.classList.add('hidden'); return; }
         const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
         if (nights <= 0) { summary.classList.add('hidden'); return; }
-        const base  = BASE_PRICE * nights;
-        const tax   = +(base * 0.12).toFixed(2);
-        const levy  = 5 * nights;
+        const base = BASE_PRICE * nights;
+        const tax = +(base * 0.12).toFixed(2);
+        const levy = 5 * nights;
         const total = base + tax + levy;
-        document.getElementById('nightsLabel').textContent  = nights + ' night' + (nights !== 1 ? 's' : '');
-        document.getElementById('nightsTotal').textContent  = '$' + total.toFixed(2);
-        document.getElementById('baseRate').textContent     = '$' + base.toFixed(2);
-        document.getElementById('taxAmount').textContent    = '$' + tax.toFixed(2);
-        document.getElementById('levyAmount').textContent   = '$' + levy.toFixed(2);
-        document.getElementById('totalAmount').textContent  = '$' + total.toFixed(2);
+        document.getElementById('nightsLabel').textContent = nights + ' night' + (nights !== 1 ? 's' : '');
+        document.getElementById('nightsTotal').textContent = '$' + total.toFixed(2);
+        document.getElementById('baseRate').textContent = '$' + base.toFixed(2);
+        document.getElementById('taxAmount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('levyAmount').textContent = '$' + levy.toFixed(2);
+        document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
         summary.classList.remove('hidden');
     }
-    document.getElementById('checkInDate').addEventListener('change',  recalcPrice);
+    document.getElementById('checkInDate').addEventListener('change', recalcPrice);
     document.getElementById('checkOutDate').addEventListener('change', recalcPrice);
     (function() {
         const fmt = d => d.toISOString().split('T')[0];
         const t = new Date(), tmr = new Date(); tmr.setDate(t.getDate() + 1);
-        document.getElementById('checkInDate').value  = fmt(t);
+        document.getElementById('checkInDate').value = fmt(t);
         document.getElementById('checkOutDate').value = fmt(tmr);
         recalcPrice();
     })();
@@ -411,7 +407,7 @@
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const on = btn.classList.contains('active');
-            const c  = btn.querySelector('span');
+            const c = btn.querySelector('span');
             if (on) {
                 btn.classList.remove('active','bg-primary'); btn.classList.add('bg-outline-variant');
                 c.classList.replace('translate-x-6','translate-x-1'); btn.setAttribute('aria-checked','false');
