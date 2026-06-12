@@ -1,0 +1,435 @@
+@{
+    ViewData["Title"] = "Room Details";
+    ViewData["ActivePage"] = "Rooms";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var roomId = ViewData["RoomId"] ?? 1;
+    var roomType = ViewData["RoomType"] ?? "Business Suite";
+    var roomNum = ViewData["RoomNum"] ?? "Room 402";
+    var floor = ViewData["Floor"] ?? "Executive Floor";
+    var priceNight = ViewData["Price"] ?? "$285";
+    var basePrice = ViewData["BasePrice"] ?? 250;
+}
+
+<style>
+    #carousel-img { transition: opacity 0.25s ease; }
+    .thumb-item { cursor: pointer; transition: all 0.15s; }
+    .thumb-item.active { outline: 2px solid #031635; outline-offset: 2px; }
+    .amenity-card { transition: transform 0.15s, box-shadow 0.15s; }
+    .amenity-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(3,22,53,0.10); }
+    .toggle-btn { transition: background 0.2s; }
+    .toggle-btn.active { background: #031635 !important; }
+    .toggle-btn span { transition: transform 0.2s; }
+    .booking-input { transition: border-color 0.15s, box-shadow 0.15s; }
+    .booking-input:focus {
+        outline: none;
+        border-color: #031635;
+        box-shadow: 0 0 0 2px rgba(3,22,53,0.12);
+    }
+    @@media (min-width: 768px) {
+        .booking-aside {
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 96px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .booking-aside::-webkit-scrollbar { display: none; }
+    }
+    .feature-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 14px; border-radius: 99px;
+        background: #efedf0; font-size: 13px; font-weight: 500; color: #44474e;
+    }
+    .star-filled { font-variation-settings: 'FILL' 1; }
+    #booking-success {
+        display: none; position: fixed; inset: 0; z-index: 9999;
+        background: rgba(3,22,53,0.55); backdrop-filter: blur(4px);
+        align-items: center; justify-content: center;
+    }
+    #booking-success.show { display: flex; }
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-card { animation: fadeUp 0.3s ease; }
+</style>
+
+<!-- BREADCRUMB -->
+<div class="max-w-[1440px] mx-auto px-gutter pt-lg pb-sm flex items-center gap-xs text-label-sm text-on-surface-variant">
+    <a asp-controller="Room" asp-action="Index" class="hover:text-primary transition-colors">Rooms</a>
+    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+    <a asp-controller="Explore" asp-action="Index" class="hover:text-primary transition-colors">Explore</a>
+    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+    <span class="text-primary font-semibold">@roomType</span>
+</div>
+
+<main class="max-w-[1440px] mx-auto px-gutter pb-xl flex flex-col md:flex-row gap-xl items-start">
+
+    <!-- LEFT COLUMN -->
+    <div class="flex-1 space-y-lg min-w-0">
+
+        <!-- Carousel -->
+        <section class="relative group">
+            <div class="w-full h-[420px] md:h-[480px] rounded-xl overflow-hidden shadow-sm relative" id="carousel">
+                <img id="carousel-img"
+                     class="w-full h-full object-cover"
+                     src="/images/rooms/BookingSampleImage/BookingSample1.avif"
+                     alt="@roomType" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent flex items-end p-lg pointer-events-none">
+                    <div>
+                        <span class="bg-primary text-white text-label-sm font-label-sm px-md py-xs rounded-full mb-sm inline-block uppercase tracking-wider">@roomType</span>
+                        <h1 class="text-white font-headline-lg text-headline-lg">@floor — @roomNum</h1>
+                    </div>
+                </div>
+                <div class="absolute top-md right-md">
+                    <span class="bg-green-100 text-green-800 font-label-sm text-label-sm px-md py-xs rounded-full flex items-center gap-xs">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
+                    </span>
+                </div>
+                <button onclick="prevSlide()" class="absolute left-md top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button onclick="nextSlide()" class="absolute right-md top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+            <!-- Thumbnails -->
+            <div class="flex gap-md mt-md overflow-x-auto hide-scrollbar pb-1">
+                <div class="thumb-item active flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden" onclick="goToSlide(0)">
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample1.avif" alt="View 1" />
+                </div>
+                <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(1)">
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample2.avif" alt="View 2" />
+                </div>
+                <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(2)">
+                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample3.avif" alt="View 3" />
+                </div>
+            </div>
+        </section>
+
+        <!-- Amenities Bento -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-md">
+            <div class="amenity-card bg-surface-container-lowest p-md rounded-xl shadow-sm flex flex-col items-center text-center border border-outline-variant/20">
+                <span class="material-symbols-outlined text-primary text-3xl mb-sm">wifi</span>
+                <p class="font-label-md text-label-md text-on-surface">Ultra-Fast Wi-Fi</p>
+                <p class="text-body-sm text-on-surface-variant">Gigabit Fiber</p>
+            </div>
+            <div class="amenity-card bg-surface-container-lowest p-md rounded-xl shadow-sm flex flex-col items-center text-center border border-outline-variant/20">
+                <span class="material-symbols-outlined text-primary text-3xl mb-sm">laptop_mac</span>
+                <p class="font-label-md text-label-md text-on-surface">Pro Workspace</p>
+                <p class="text-body-sm text-on-surface-variant">Ergonomic Chair</p>
+            </div>
+            <div class="amenity-card bg-surface-container-lowest p-md rounded-xl shadow-sm flex flex-col items-center text-center border border-outline-variant/20">
+                <span class="material-symbols-outlined text-primary text-3xl mb-sm">local_bar</span>
+                <p class="font-label-md text-label-md text-on-surface">Curated Mini-bar</p>
+                <p class="text-body-sm text-on-surface-variant">Artisan Selection</p>
+            </div>
+            <div class="amenity-card bg-surface-container-lowest p-md rounded-xl shadow-sm flex flex-col items-center text-center border border-outline-variant/20">
+                <span class="material-symbols-outlined text-primary text-3xl mb-sm">room_service</span>
+                <p class="font-label-md text-label-md text-on-surface">24/7 Service</p>
+                <p class="text-body-sm text-on-surface-variant">In-room Dining</p>
+            </div>
+        </section>
+
+        <!-- Room Description -->
+        <section class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
+            <div class="flex items-start justify-between gap-md mb-md flex-wrap">
+                <h2 class="font-headline-sm text-headline-sm text-primary">Room Description</h2>
+                <div class="flex items-center gap-xs shrink-0">
+                    <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
+                    <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
+                    <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
+                    <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
+                    <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star_half</span>
+                    <span class="font-bold text-label-md text-primary ml-1">4.9</span>
+                    <span class="text-body-sm text-on-surface-variant">(128 reviews)</span>
+                </div>
+            </div>
+            <p class="text-body-md text-on-surface-variant leading-relaxed">
+                Designed specifically for the modern professional, our Business Suite offers a seamless blend
+                of productivity and comfort. The suite features a soundproof environment, perfect for video
+                conferences and deep focus. Enjoy a signature king-size sleep system, a climate-controlled
+                environment, and a dedicated refreshment station.
+            </p>
+            <div class="mt-lg pt-lg border-t border-outline-variant/30 flex flex-wrap gap-sm">
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> 45 sqm Space</span>
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> City View</span>
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Nespresso Machine</span>
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Smart Lighting</span>
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> King Bed</span>
+                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Marble Bathroom</span>
+            </div>
+        </section>
+
+        <!-- What's Nearby -->
+        <section class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
+            <h2 class="font-headline-sm text-headline-sm text-primary mb-md">What's Nearby</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">restaurant</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">Gourmet Restaurant</p>
+                        <p class="text-body-sm text-on-surface-variant">Level 1 · Open 6AM – 10PM</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">fitness_center</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">Fitness Center</p>
+                        <p class="text-body-sm text-on-surface-variant">Level B1 · 24 / 7</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">pool</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">Infinity Pool</p>
+                        <p class="text-body-sm text-on-surface-variant">Rooftop · 7AM – 9PM</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">spa</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">Wellness Spa</p>
+                        <p class="text-body-sm text-on-surface-variant">Level 3 · By appointment</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- RIGHT COLUMN — Sticky Booking Sidebar -->
+    <aside class="booking-aside w-full md:w-[400px] shrink-0 space-y-lg">
+
+        <!-- Pricing Card -->
+        <div class="bg-primary text-white p-lg rounded-xl shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-md">
+                    <span class="font-label-md text-label-md bg-white/20 px-sm py-1 rounded-lg text-xs uppercase tracking-wider">AI-Recommended Rate</span>
+                    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">auto_awesome</span>
+                </div>
+                <div class="flex items-baseline gap-xs">
+                    <span class="text-display-lg font-display-lg" id="priceDisplay">@priceNight</span>
+                    <span class="text-body-sm opacity-80">/ night</span>
+                </div>
+                <div class="mt-md space-y-sm text-body-sm opacity-90">
+                    <div class="flex justify-between"><span>Base Rate</span><span id="baseRate">—</span></div>
+                    <div class="flex justify-between"><span>Service Tax (12%)</span><span id="taxAmount">—</span></div>
+                    <div class="flex justify-between"><span>Tourism Levy</span><span id="levyAmount">—</span></div>
+                    <div class="border-t border-white/20 pt-sm flex justify-between font-bold text-body-md opacity-100">
+                        <span>Total due now</span><span id="totalAmount">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
+            <h2 class="font-headline-sm text-headline-sm text-primary mb-lg">Complete Booking</h2>
+            <form class="space-y-md" id="bookingForm" onsubmit="submitBooking(event)">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="roomId" value="@roomId" />
+
+                <div>
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Guest Name</label>
+                    <input class="booking-input w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-body-md"
+                           type="text" name="guestName" placeholder="Johnathan Doe" required />
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div>
+                        <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Check-in</label>
+                        <input class="booking-input w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-body-md"
+                               type="date" name="checkIn" id="checkInDate" required />
+                    </div>
+                    <div>
+                        <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Check-out</label>
+                        <input class="booking-input w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-body-md"
+                               type="date" name="checkOut" id="checkOutDate" required />
+                    </div>
+                </div>
+
+                <div id="nightsSummary" class="hidden bg-primary/5 border border-primary/20 rounded-lg px-md py-sm flex items-center justify-between">
+                    <span class="text-body-sm text-on-surface-variant" id="nightsLabel"></span>
+                    <span class="font-bold text-primary text-label-md" id="nightsTotal"></span>
+                </div>
+
+                <div>
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Guests</label>
+                    <div class="flex items-center border border-outline-variant rounded-lg overflow-hidden">
+                        <button type="button" onclick="changeGuests(-1)" class="px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors font-bold text-lg w-12 text-center">−</button>
+                        <span id="guestCount" class="flex-1 text-center font-bold text-on-surface text-body-md py-sm">2</span>
+                        <button type="button" onclick="changeGuests(1)" class="px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors font-bold text-lg w-12 text-center">+</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Payment Method</label>
+                    <div class="space-y-sm">
+                        <label class="flex items-center gap-md p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+                            <input class="accent-primary h-4 w-4" name="payment" type="radio" value="cc" checked />
+                            <span class="material-symbols-outlined text-on-surface-variant">credit_card</span>
+                            <span class="font-body-md text-body-md">Credit Card</span>
+                        </label>
+                        <label class="flex items-center gap-md p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+                            <input class="accent-primary h-4 w-4" name="payment" type="radio" value="cash" />
+                            <span class="material-symbols-outlined text-on-surface-variant">payments</span>
+                            <span class="font-body-md text-body-md">Cash</span>
+                        </label>
+                        <label class="flex items-center gap-md p-md border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+                            <input class="accent-primary h-4 w-4" name="payment" type="radio" value="check" />
+                            <span class="material-symbols-outlined text-on-surface-variant">account_balance_wallet</span>
+                            <span class="font-body-md text-body-md">Check</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-md border-t border-outline-variant/30">
+                    <p class="text-label-sm font-label-sm text-on-surface-variant mb-md uppercase tracking-wide">Notification Preferences</p>
+                    <div class="flex items-center justify-between mb-sm">
+                        <span class="text-body-sm text-on-surface font-medium">Booking Confirmations</span>
+                        <button type="button" role="switch" aria-checked="true"
+                                class="toggle-btn active relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors">
+                            <span class="translate-x-6 inline-block h-4 w-4 rounded-full bg-white shadow transition-transform"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-body-sm text-on-surface font-medium">Cancellation Alerts</span>
+                        <button type="button" role="switch" aria-checked="false"
+                                class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full bg-outline-variant transition-colors">
+                            <span class="translate-x-1 inline-block h-4 w-4 rounded-full bg-white shadow transition-transform"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-primary text-white py-md rounded-xl font-headline-sm text-headline-sm
+                               hover:opacity-90 active:scale-95 transition-all shadow-md
+                               flex items-center justify-center gap-sm">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                    Confirm Booking
+                </button>
+                <p class="text-center text-label-sm font-label-sm text-on-surface-variant">Instant confirmation available</p>
+            </form>
+        </div>
+
+        <!-- Policy -->
+        <div class="bg-surface-container p-md rounded-xl border border-outline-variant/20">
+            <div class="flex items-start gap-md">
+                <span class="material-symbols-outlined text-on-surface-variant shrink-0">info</span>
+                <div>
+                    <p class="font-label-md text-label-md text-on-surface">Cancellation Policy</p>
+                    <p class="text-body-sm text-on-surface-variant mt-1">Free cancellation up to 48 hours before check-in. Changes after that may incur fees.</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+</main>
+
+<!-- SUCCESS OVERLAY -->
+<div id="booking-success" role="dialog" aria-modal="true">
+    <div class="modal-card bg-surface-container-lowest rounded-2xl shadow-2xl p-xl max-w-md w-full mx-gutter text-center border border-outline-variant/20">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-lg">
+            <span class="material-symbols-outlined text-green-600 text-[44px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-primary mb-sm">Booking Confirmed!</h2>
+        <p class="text-body-md text-on-surface-variant mb-xs">Your reservation has been placed successfully.</p>
+        <p class="text-label-sm text-on-surface-variant mb-xl" id="successSummary"></p>
+        <div class="flex gap-md">
+            <a asp-controller="Booking" asp-action="MyBookings"
+               class="flex-1 bg-primary text-on-primary py-md rounded-xl font-label-md text-center hover:bg-primary-container transition-colors">
+                View My Bookings
+            </a>
+            <button type="button" onclick="closeSuccess()"
+                    class="flex-1 border border-outline-variant text-on-surface py-md rounded-xl font-label-md hover:bg-surface-container transition-colors">
+                Stay Here
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const slides = [
+        "/images/rooms/BookingSampleImage/BookingSample1.avif",
+        "/images/rooms/BookingSampleImage/BookingSample2.avif",
+        "/images/rooms/BookingSampleImage/BookingSample3.avif"
+    ];
+    let currentSlide = 0;
+    const imgEl = document.getElementById('carousel-img');
+
+    function updateSlide() {
+        imgEl.style.opacity = '0';
+        setTimeout(() => { imgEl.src = slides[currentSlide]; imgEl.style.opacity = '1'; }, 200);
+        document.querySelectorAll('.thumb-item').forEach((t, i) => t.classList.toggle('active', i === currentSlide));
+    }
+    function nextSlide() { currentSlide = (currentSlide + 1) % slides.length; updateSlide(); }
+    function prevSlide() { currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateSlide(); }
+    function goToSlide(i) { currentSlide = i; updateSlide(); }
+
+    let guests = 2;
+    function changeGuests(d) {
+        guests = Math.max(1, Math.min(10, guests + d));
+        document.getElementById('guestCount').textContent = guests;
+    }
+
+    const BASE_PRICE = @basePrice;
+    function recalcPrice() {
+        const ci = document.getElementById('checkInDate').value;
+        const co = document.getElementById('checkOutDate').value;
+        const summary = document.getElementById('nightsSummary');
+        if (!ci || !co) { summary.classList.add('hidden'); return; }
+        const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
+        if (nights <= 0) { summary.classList.add('hidden'); return; }
+        const base = BASE_PRICE * nights;
+        const tax = +(base * 0.12).toFixed(2);
+        const levy = 5 * nights;
+        const total = base + tax + levy;
+        document.getElementById('nightsLabel').textContent = nights + ' night' + (nights !== 1 ? 's' : '');
+        document.getElementById('nightsTotal').textContent = '$' + total.toFixed(2);
+        document.getElementById('baseRate').textContent = '$' + base.toFixed(2);
+        document.getElementById('taxAmount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('levyAmount').textContent = '$' + levy.toFixed(2);
+        document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+        summary.classList.remove('hidden');
+    }
+    document.getElementById('checkInDate').addEventListener('change', recalcPrice);
+    document.getElementById('checkOutDate').addEventListener('change', recalcPrice);
+    (function() {
+        const fmt = d => d.toISOString().split('T')[0];
+        const t = new Date(), tmr = new Date(); tmr.setDate(t.getDate() + 1);
+        document.getElementById('checkInDate').value = fmt(t);
+        document.getElementById('checkOutDate').value = fmt(tmr);
+        recalcPrice();
+    })();
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const on = btn.classList.contains('active');
+            const c = btn.querySelector('span');
+            if (on) {
+                btn.classList.remove('active','bg-primary'); btn.classList.add('bg-outline-variant');
+                c.classList.replace('translate-x-6','translate-x-1'); btn.setAttribute('aria-checked','false');
+            } else {
+                btn.classList.add('active','bg-primary'); btn.classList.remove('bg-outline-variant');
+                c.classList.replace('translate-x-1','translate-x-6'); btn.setAttribute('aria-checked','true');
+            }
+        });
+    });
+
+    function submitBooking(e) {
+        e.preventDefault();
+        const name = e.target.guestName.value.trim();
+        const ci = document.getElementById('checkInDate').value;
+        const co = document.getElementById('checkOutDate').value;
+        if (!name || !ci || !co) return;
+        const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
+        const fmt = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+        document.getElementById('successSummary').textContent =
+            name + ' · ' + fmt(ci) + ' → ' + fmt(co) + ' (' + nights + ' night' + (nights !== 1 ? 's' : '') + ')';
+        document.getElementById('booking-success').classList.add('show');
+    }
+    function closeSuccess() { document.getElementById('booking-success').classList.remove('show'); }
+</script>
+}
