@@ -1,11 +1,27 @@
+@model List<StayWithMeh.Models.Room>
 @{
-    ViewData["Title"] = "Browse Rooms";
+    ViewData["Title"]      = "Browse Rooms";
     ViewData["ActivePage"] = "Rooms";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var roomTypeDisplay = new Dictionary<string, string>
+    {
+        { "Business Suite", "Business Suite" },
+        { "Standard",       "Standard" },
+        { "Deluxe Suite",   "Deluxe Suite" },
+        { "Family Suite",   "Family Suite" }
+    };
+
+    var roomTypeIcons = new Dictionary<string, (string icon, string label)>
+    {
+        { "Business Suite", ("desk", "Work Desk") },
+        { "Standard",       ("king_bed", "King Bed") },
+        { "Deluxe Suite",   ("waves", "Ocean View") },
+        { "Family Suite",   ("family_restroom", "Sleeps 4") }
+    };
 }
 
 <style>
-    /* ── Booking Modal ── */
     #bookingModal {
         display: none;
         position: fixed;
@@ -33,21 +49,16 @@
 
     @@keyframes modalSlideUp {
         from { opacity: 0; transform: translateY(24px); }
-        to { opacity: 1; transform: translateY(0); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Booking form ── */
     .booking-input { transition: border-color 0.15s, box-shadow 0.15s; }
     .booking-input:focus {
         outline: none;
         border-color: #031635;
         box-shadow: 0 0 0 2px rgba(3,22,53,0.12);
     }
-    .toggle-btn { transition: background 0.2s; }
-    .toggle-btn.active { background: #031635 !important; }
-    .toggle-btn span { transition: transform 0.2s; }
 
-    /* ── Success overlay ── */
     #bookingSuccess {
         display: none;
         position: fixed;
@@ -66,7 +77,6 @@
     }
     .success-card { animation: fadeUp 0.3s ease; }
 
-    /* ── Carousel in modal ── */
     #modalCarouselImg { transition: opacity 0.25s ease; }
     .modal-thumb {
         cursor: pointer;
@@ -79,7 +89,6 @@
     }
     .modal-thumb.active { outline: 2px solid #031635; outline-offset: 2px; }
 
-    /* ── Feature pills ── */
     .feature-pill {
         display: inline-flex; align-items: center; gap: 5px;
         padding: 4px 12px; border-radius: 99px;
@@ -87,7 +96,6 @@
     }
 </style>
 
-<!-- ═══ PAGE HEADER ═══ -->
 <div class="max-w-[1440px] mx-auto px-gutter py-xl">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
         <div>
@@ -104,7 +112,6 @@
         </div>
     </div>
 
-    <!-- Filter Tabs -->
     <div class="border-b border-outline-variant mb-xl overflow-x-auto hide-scrollbar">
         <div class="flex min-w-max">
             <button onclick="filterRooms('All Rooms', this)"
@@ -113,346 +120,111 @@
             <button onclick="filterRooms('Available', this)"
                     class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
                            border-b-2 border-transparent -mb-px hover:text-primary transition-colors">Available</button>
-            <button onclick="filterRooms('Suite', this)"
+            <button onclick="filterRooms('Deluxe Suite', this)"
                     class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
                            border-b-2 border-transparent -mb-px hover:text-primary transition-colors">Suites</button>
             <button onclick="filterRooms('Standard', this)"
                     class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
                            border-b-2 border-transparent -mb-px hover:text-primary transition-colors">Standard</button>
-            <button onclick="filterRooms('Family', this)"
+            <button onclick="filterRooms('Family Suite', this)"
                     class="room-tab py-4 px-lg font-label-md text-label-md text-on-surface-variant
                            border-b-2 border-transparent -mb-px hover:text-primary transition-colors">Family</button>
         </div>
     </div>
 
-    <!-- Room Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-lg" id="roomGrid">
 
-        <!-- Skyline Executive Suite -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
-             data-type="Suite" data-status="Available" data-room-id="1" data-price="450.00"
-             data-name="Skyline Executive Suite" data-floor="Room 402, 4th Floor"
-             data-type-label="Business Suite" data-base="400">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/SkylineExecutiveSuiteRoom.png"
-                     alt="Skyline Executive Suite" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Available
-                    </span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 402, 4th Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.9</span>
+        @foreach (var room in Model)
+        {
+            var isAvailable = room.Status.Equals("available", StringComparison.OrdinalIgnoreCase);
+            var icon  = roomTypeIcons.TryGetValue(room.RoomType, out var iv) ? iv.icon  : "bed";
+            var label = roomTypeIcons.TryGetValue(room.RoomType, out var lv) ? lv.label : "Room";
+
+            <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
+                        overflow-hidden flex flex-col hover:shadow-lg @(isAvailable ? "hover:-translate-y-1" : "") transition-all group"
+                 data-type="@room.RoomType" data-status="@(isAvailable ? "Available" : "Unavailable")"
+                 data-room-id="@room.Id" data-price="@room.PricePerNight.ToString("0.00")"
+                 data-name="@($"Room {room.RoomNumber}")" data-floor="@($"Room {room.RoomNumber}")"
+                 data-type-label="@room.RoomType" data-base="@room.BasePrice.ToString("0")">
+
+                <div class="relative h-52 overflow-hidden">
+                    <img class="w-full h-full object-cover @(isAvailable ? "" : "opacity-80") transition-transform duration-500 group-hover:scale-105"
+                         src="@room.ImageUrl" alt="Room @room.RoomNumber" />
+                    <div class="absolute top-4 right-4">
+                        @if (isAvailable)
+                        {
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Available
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-label-sm text-label-sm">Unavailable</span>
+                        }
                     </div>
+                    <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
+                                   flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+                            onclick="toggleSave(this)">
+                        <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+                    </button>
                 </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Skyline Executive Suite</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">king_bed</span><span class="text-body-sm">King Bed</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">wifi</span><span class="text-body-sm">WiFi</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">balcony</span><span class="text-body-sm">Balcony</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">location_city</span><span class="text-body-sm">City View</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <div class="flex items-center gap-2">
-                            <span class="font-headline-sm text-headline-sm text-primary">$450.00</span>
-                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-medium">AI Priced</span>
+                <div class="p-lg flex flex-col flex-grow @(isAvailable ? "" : "opacity-80")">
+                    <div class="flex justify-between items-start mb-xs">
+                        <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room @room.RoomNumber</p>
+                        <div class="flex items-center gap-1 text-primary">
+                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+                            <span class="font-bold text-label-sm">4.8</span>
                         </div>
                     </div>
-                    <div class="flex gap-sm">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="1"
-                           class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
-                        <button onclick="openBookingModal(this.closest('.room-card'))"
-                                class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Superior Twin Room -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
-             data-type="Standard" data-status="Available" data-room-id="2" data-price="210.00"
-             data-name="Superior Twin Room" data-floor="Room 215, 2nd Floor"
-             data-type-label="Standard" data-base="190">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/SuperiorTwinRoom.png" alt="Superior Twin Room" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Available
-                    </span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 215, 2nd Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.6</span>
-                    </div>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Superior Twin Room</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">bed</span><span class="text-body-sm">Twin Beds</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">ac_unit</span><span class="text-body-sm">AC</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">coffee_maker</span><span class="text-body-sm">Coffee</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-sm text-headline-sm text-primary">$210.00</span>
-                    </div>
-                    <div class="flex gap-sm">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="2"
-                           class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
-                        <button onclick="openBookingModal(this.closest('.room-card'))"
-                                class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Deluxe Ocean View — Unavailable -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg transition-all group"
-             data-type="Suite" data-status="Unavailable" data-room-id="3" data-price="325.00"
-             data-name="Deluxe Ocean View" data-floor="Room 601, 6th Floor"
-             data-type-label="Deluxe Suite" data-base="290">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/DeluxeOceanViewRoom.png" alt="Deluxe Ocean View" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-label-sm text-label-sm">Unavailable</span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow opacity-80">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 601, 6th Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.8</span>
-                    </div>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Deluxe Ocean View</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">king_bed</span><span class="text-body-sm">King Bed</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">waves</span><span class="text-body-sm">Ocean View</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">balcony</span><span class="text-body-sm">Balcony</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-sm text-headline-sm text-primary">$325.00</span>
-                    </div>
-                    <button class="bg-surface-container text-outline px-lg py-sm rounded-xl font-label-md cursor-not-allowed text-sm">Join Waitlist</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Standard King Room -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
-             data-type="Standard" data-status="Available" data-room-id="4" data-price="180.00"
-             data-name="Standard King Room" data-floor="Room 304, 3rd Floor"
-             data-type-label="Standard" data-base="160">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/StandardKingRoom.png" alt="Standard King Room" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Available
-                    </span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 304, 3rd Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.4</span>
-                    </div>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Standard King Room</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">king_bed</span><span class="text-body-sm">King Bed</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">tv</span><span class="text-body-sm">Smart TV</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">wifi</span><span class="text-body-sm">WiFi</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-sm text-headline-sm text-primary">$180.00</span>
-                    </div>
-                    <div class="flex gap-sm">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="4"
-                           class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
-                        <button onclick="openBookingModal(this.closest('.room-card'))"
-                                class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Family Connection Suite -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
-             data-type="Family" data-status="Available" data-room-id="5" data-price="380.00"
-             data-name="Family Connection Suite" data-floor="Room 510, 5th Floor"
-             data-type-label="Family Suite" data-base="340">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/FamilyConnectionSuiteRoom.png" alt="Family Connection Suite" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Available
-                    </span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 510, 5th Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.7</span>
-                    </div>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Family Connection Suite</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">family_restroom</span><span class="text-body-sm">Sleeps 4</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">kitchen</span><span class="text-body-sm">Kitchenette</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">bathtub</span><span class="text-body-sm">Bathtub</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-sm text-headline-sm text-primary">$380.00</span>
-                    </div>
-                    <div class="flex gap-sm">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="5"
-                           class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
-                        <button onclick="openBookingModal(this.closest('.room-card'))"
-                                class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Executive Studio -->
-        <div class="room-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20
-                    overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all group"
-             data-type="Suite" data-status="Available" data-room-id="6" data-price="150.00"
-             data-name="Executive Studio" data-floor="Room 102, 1st Floor"
-             data-type-label="Business Suite" data-base="130">
-            <div class="relative h-52 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                     src="~/images/rooms/Rooms_Dashboard/ExecutiveStudioRoom.png" alt="Executive Studio" />
-                <div class="absolute top-4 right-4">
-                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Available
-                    </span>
-                </div>
-                <button class="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full
-                               flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                        onclick="toggleSave(this)">
-                    <span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
-                </button>
-            </div>
-            <div class="p-lg flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-xs">
-                    <p class="text-on-surface-variant font-label-sm text-label-sm room-floor">Room 102, 1st Floor</p>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-sm">4.5</span>
-                    </div>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Executive Studio</h3>
-                <div class="flex flex-wrap gap-md mb-lg">
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">desk</span><span class="text-body-sm">Work Desk</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">microwave</span><span class="text-body-sm">Pantry</span></div>
-                    <div class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">wifi</span><span class="text-body-sm">WiFi</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
-                        <div class="flex items-center gap-2">
-                            <span class="font-headline-sm text-headline-sm text-primary">$150.00</span>
-                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-medium">AI Priced</span>
+                    <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">@room.RoomType — Room @room.RoomNumber</h3>
+                    <p class="text-on-surface-variant font-body-sm mb-lg">@room.Description</p>
+                    <div class="flex flex-wrap gap-md mb-lg">
+                        <div class="flex items-center gap-1 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[18px]">@icon</span>
+                            <span class="text-body-sm">@label</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[18px]">wifi</span>
+                            <span class="text-body-sm">WiFi</span>
                         </div>
                     </div>
-                    <div class="flex gap-sm">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="6"
-                           class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
-                        <button onclick="openBookingModal(this.closest('.room-card'))"
-                                class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
+                    <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-outline tracking-widest mb-1">Per Night</p>
+                            <span class="font-headline-sm text-headline-sm text-primary">$@room.PricePerNight.ToString("0.00")</span>
+                        </div>
+                        <div class="flex gap-sm">
+                            <a asp-controller="Room" asp-action="Details" asp-route-id="@room.Id"
+                               class="border border-outline-variant text-primary px-md py-sm rounded-xl font-label-md hover:bg-surface-container transition-colors text-sm">Details</a>
+                            @if (isAvailable)
+                            {
+                                <button onclick="openBookingModal(this.closest('.room-card'))"
+                                        class="bg-primary text-on-primary px-md py-sm rounded-xl font-label-md hover:bg-primary-container transition-colors text-sm">Book Now</button>
+                            }
+                            else
+                            {
+                                <button class="bg-surface-container text-outline px-md py-sm rounded-xl font-label-md cursor-not-allowed text-sm">Join Waitlist</button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
 
     </div>
 
-    <!-- Pagination -->
     <div class="mt-xl flex justify-between items-center bg-surface-container-lowest p-md
                 rounded-xl shadow-sm border border-outline-variant/20">
         <p class="text-body-sm text-on-surface-variant">
-            Showing <span class="font-bold text-on-surface">6</span> of
-            <span class="font-bold text-on-surface">24</span> rooms
+            Showing <span class="font-bold text-on-surface">@Model.Count</span> of
+            <span class="font-bold text-on-surface">@Model.Count</span> rooms
         </p>
-        <div class="flex gap-2">
-            <button class="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
-                <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-            <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-on-primary font-bold">1</button>
-            <button class="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">2</button>
-            <button class="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">3</button>
-            <button class="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-        </div>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     BOOKING MODAL
-═══════════════════════════════════════════════ -->
 <div id="bookingModal" onclick="handleModalBackdropClick(event)">
     <div id="modalPanel">
 
-        <!-- Modal Header -->
         <div class="flex items-center justify-between p-lg border-b border-outline-variant/30 sticky top-0 bg-white z-10">
             <div>
                 <h2 id="modalRoomName" class="font-headline-sm text-headline-sm text-primary"></h2>
@@ -464,17 +236,12 @@
             </button>
         </div>
 
-        <!-- Modal Body -->
         <div class="flex flex-col md:flex-row gap-lg p-lg">
 
-            <!-- Left: Image + Info -->
             <div class="flex-1 space-y-md">
 
-                <!-- Image carousel -->
                 <div class="relative h-[260px] rounded-xl overflow-hidden group">
-                    <img id="modalCarouselImg"
-                         class="w-full h-full object-cover"
-                         src="" alt="Room" />
+                    <img id="modalCarouselImg" class="w-full h-full object-cover" src="" alt="Room" />
                     <div id="modalRoomTypeBadge"
                          class="absolute top-3 left-3 bg-primary text-white text-label-sm font-label-sm
                                 px-md py-xs rounded-full uppercase tracking-wider"></div>
@@ -494,12 +261,8 @@
                     </button>
                 </div>
 
-                <!-- Thumbnails -->
-                <div class="flex gap-sm overflow-x-auto hide-scrollbar" id="modalThumbs">
-                    <!-- populated by JS -->
-                </div>
+                <div class="flex gap-sm overflow-x-auto hide-scrollbar" id="modalThumbs"></div>
 
-                <!-- Amenities -->
                 <div class="grid grid-cols-4 gap-sm">
                     <div class="flex flex-col items-center text-center p-sm bg-surface-container-low rounded-xl">
                         <span class="material-symbols-outlined text-primary text-2xl mb-xs">wifi</span>
@@ -519,26 +282,16 @@
                     </div>
                 </div>
 
-                <!-- Feature pills -->
-                <div class="flex flex-wrap gap-xs">
-                    <span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> 45 sqm</span>
-                    <span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> City View</span>
-                    <span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> King Bed</span>
-                    <span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> Marble Bath</span>
-                    <span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> Smart Lighting</span>
-                </div>
+                <div class="flex flex-wrap gap-xs" id="modalFeaturePills"></div>
 
-                <!-- Cancellation Policy -->
                 <div class="bg-surface-container p-sm rounded-xl flex items-start gap-sm border border-outline-variant/20">
                     <span class="material-symbols-outlined text-on-surface-variant text-[18px] shrink-0">info</span>
                     <p class="text-body-sm text-on-surface-variant">Free cancellation up to 48 hours before check-in.</p>
                 </div>
             </div>
 
-            <!-- Right: Pricing + Form -->
             <div class="w-full md:w-[340px] shrink-0 space-y-md">
 
-                <!-- Price Card -->
                 <div class="bg-primary text-white p-lg rounded-xl relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none"></div>
                     <div class="relative z-10">
@@ -561,9 +314,9 @@
                     </div>
                 </div>
 
-                <!-- Booking Form -->
                 <form class="space-y-md bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/20"
                       id="modalBookingForm" onsubmit="submitModalBooking(event)">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="modalRoomId" name="roomId" />
 
                     <div>
@@ -585,7 +338,6 @@
                         </div>
                     </div>
 
-                    <!-- Nights summary -->
                     <div id="modalNightsSummary" class="hidden bg-primary/5 border border-primary/20 rounded-lg px-md py-sm flex items-center justify-between">
                         <span class="text-body-sm text-on-surface-variant" id="modalNightsLabel"></span>
                         <span class="font-bold text-primary text-label-md" id="modalNightsTotal"></span>
@@ -632,7 +384,6 @@
     </div>
 </div>
 
-<!-- ═══ SUCCESS OVERLAY ═══ -->
 <div id="bookingSuccess">
     <div class="success-card bg-surface-container-lowest rounded-2xl shadow-2xl p-xl max-w-md w-full
                 mx-gutter text-center border border-outline-variant/20">
@@ -660,7 +411,6 @@
 
 @section Scripts {
 <script>
-    // ── Tab filter ──
     function filterRooms(type, btn) {
         document.querySelectorAll('.room-tab').forEach(t => {
             t.classList.remove('text-primary','border-primary');
@@ -675,7 +425,6 @@
         });
     }
 
-    // ── Search filter ──
     document.getElementById('searchInput')?.addEventListener('input', function () {
         const q = this.value.toLowerCase();
         document.querySelectorAll('.room-card').forEach(card => {
@@ -684,7 +433,6 @@
         });
     });
 
-    // ── Wishlist toggle ──
     function toggleSave(btn) {
         const icon = btn.querySelector('.material-symbols-outlined');
         const card = btn.closest('.room-card');
@@ -713,10 +461,7 @@
         }
     }
 
-    // ══════════════════════════════════════════════
-    // BOOKING MODAL
-    // ══════════════════════════════════════════════
- 
+    // Slide 1 is the room's own card image; slides 2-4 are shared sample shots
     const modalSlides = [
         "/images/rooms/BookingSampleImage/BookingSample1.avif",
         "/images/rooms/BookingSampleImage/BookingSample2.avif",
@@ -727,29 +472,26 @@
     let modalGuests = 2;
 
     function openBookingModal(card) {
-        // Populate from card data attributes
-        const name = card.dataset.name;
-        const floor = card.dataset.floor;
-        const roomId = card.dataset.roomId;
-        const price = parseFloat(card.dataset.price);
-        const base = parseInt(card.dataset.base);
+        const name      = card.dataset.name;
+        const floor     = card.dataset.floor;
+        const roomId    = card.dataset.roomId;
+        const price     = parseFloat(card.dataset.price);
+        const base      = parseInt(card.dataset.base);
         const typeLabel = card.dataset.typeLabel;
-        const imgSrc = card.querySelector('img').src;
+        const imgSrc    = card.querySelector('img').src;
 
         modalBasePrice = base;
 
-        document.getElementById('modalRoomName').textContent = name;
-        document.getElementById('modalRoomFloor').textContent = floor;
-        document.getElementById('modalRoomId').value = roomId;
-        document.getElementById('modalPriceDisplay').textContent = '$' + price.toFixed(0);
+        document.getElementById('modalRoomName').textContent      = name;
+        document.getElementById('modalRoomFloor').textContent     = floor;
+        document.getElementById('modalRoomId').value              = roomId;
+        document.getElementById('modalPriceDisplay').textContent  = '$' + price.toFixed(0);
         document.getElementById('modalRoomTypeBadge').textContent = typeLabel;
 
-        // Slide 1 = room's own card image, slides 2-4 = booking sample images
         const slides = [imgSrc, ...modalSlides];
         modalCurrentSlide = 0;
         document.getElementById('modalCarouselImg').src = slides[0];
 
-        // Build thumbnails
         const thumbsEl = document.getElementById('modalThumbs');
         thumbsEl.innerHTML = slides.map((src, i) =>
             `<div class="modal-thumb ${i === 0 ? 'active' : 'border border-outline-variant/30'}"
@@ -758,11 +500,21 @@
             </div>`
         ).join('');
 
-        // Set default dates
+        const pillsByType = {
+            'Business Suite': ['Work Desk', 'City View', 'Smart Lighting'],
+            'Standard':       ['King Bed', 'Smart TV', 'Marble Bath'],
+            'Deluxe Suite':   ['Ocean View', 'King Bed', 'Balcony'],
+            'Family Suite':   ['Sleeps 4', 'Kitchenette', 'Bathtub']
+        };
+        const pills = pillsByType[typeLabel] || ['Free WiFi', 'AC', 'Smart TV'];
+        document.getElementById('modalFeaturePills').innerHTML = pills.map(p =>
+            `<span class="feature-pill"><span class="material-symbols-outlined text-[12px] text-primary">check_circle</span> ${p}</span>`
+        ).join('');
+
         const fmt = d => d.toISOString().split('T')[0];
         const today = new Date(), tmr = new Date();
         tmr.setDate(today.getDate() + 1);
-        document.getElementById('modalCheckIn').value = fmt(today);
+        document.getElementById('modalCheckIn').value  = fmt(today);
         document.getElementById('modalCheckOut').value = fmt(tmr);
         document.getElementById('modalGuestCount').textContent = '2';
         modalGuests = 2;
@@ -781,7 +533,6 @@
         if (e.target === document.getElementById('bookingModal')) closeBookingModal();
     }
 
-    // ── Modal carousel ──
     function goToModalSlide(i, thumbEl, slides) {
         modalCurrentSlide = i;
         document.getElementById('modalCarouselImg').style.opacity = '0';
@@ -805,13 +556,11 @@
         thumbs[modalCurrentSlide]?.click();
     }
 
-    // ── Modal guests ──
     function changeModalGuests(d) {
         modalGuests = Math.max(1, Math.min(10, modalGuests + d));
         document.getElementById('modalGuestCount').textContent = modalGuests;
     }
 
-    // ── Modal price recalc ──
     function recalcModalPrice() {
         const ci = document.getElementById('modalCheckIn').value;
         const co = document.getElementById('modalCheckOut').value;
@@ -819,28 +568,27 @@
         if (!ci || !co) { summary.classList.add('hidden'); return; }
         const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
         if (nights <= 0) { summary.classList.add('hidden'); return; }
-        const base = modalBasePrice * nights;
-        const tax = +(base * 0.12).toFixed(2);
-        const levy = 5 * nights;
+        const base  = modalBasePrice * nights;
+        const tax   = +(base * 0.12).toFixed(2);
+        const levy  = 5 * nights;
         const total = base + tax + levy;
-        document.getElementById('modalNightsLabel').textContent = nights + ' night' + (nights !== 1 ? 's' : '');
-        document.getElementById('modalNightsTotal').textContent = '$' + total.toFixed(2);
-        document.getElementById('modalBaseRate').textContent = '$' + base.toFixed(2);
-        document.getElementById('modalTaxAmount').textContent = '$' + tax.toFixed(2);
-        document.getElementById('modalLevyAmount').textContent = '$' + levy.toFixed(2);
-        document.getElementById('modalTotalAmount').textContent = '$' + total.toFixed(2);
+        document.getElementById('modalNightsLabel').textContent  = nights + ' night' + (nights !== 1 ? 's' : '');
+        document.getElementById('modalNightsTotal').textContent  = '$' + total.toFixed(2);
+        document.getElementById('modalBaseRate').textContent     = '$' + base.toFixed(2);
+        document.getElementById('modalTaxAmount').textContent    = '$' + tax.toFixed(2);
+        document.getElementById('modalLevyAmount').textContent   = '$' + levy.toFixed(2);
+        document.getElementById('modalTotalAmount').textContent  = '$' + total.toFixed(2);
         summary.classList.remove('hidden');
     }
 
-    document.getElementById('modalCheckIn').addEventListener('change', recalcModalPrice);
+    document.getElementById('modalCheckIn').addEventListener('change',  recalcModalPrice);
     document.getElementById('modalCheckOut').addEventListener('change', recalcModalPrice);
 
-    // ── Modal submit ──
     function submitModalBooking(e) {
         e.preventDefault();
         const name = document.getElementById('modalGuestName').value.trim();
-        const ci = document.getElementById('modalCheckIn').value;
-        const co = document.getElementById('modalCheckOut').value;
+        const ci   = document.getElementById('modalCheckIn').value;
+        const co   = document.getElementById('modalCheckOut').value;
         if (!name || !ci || !co) return;
         const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
         const fmt = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
@@ -855,7 +603,6 @@
         document.getElementById('bookingSuccess').classList.remove('show');
     }
 
-    // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeBookingModal();
