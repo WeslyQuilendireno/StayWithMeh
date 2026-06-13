@@ -235,6 +235,13 @@
                            type="text" name="guestName" placeholder="Johnathan Doe" required />
                 </div>
 
+                <div>
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Email Address</label>
+                    <input class="booking-input w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-body-md"
+                           type="email" name="guestEmail" placeholder="you@example.com" required />
+                    <p class="text-label-sm text-on-surface-variant mt-xs">Used to find your bookings later. No account needed.</p>
+                </div>
+
                 <div class="grid grid-cols-2 gap-md">
                     <div>
                         <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Check-in</label>
@@ -414,17 +421,51 @@
         });
     });
 
-    function submitBooking(e) {
+    async function submitBooking(e) {
         e.preventDefault();
-        const name = e.target.guestName.value.trim();
-        const ci = document.getElementById('checkInDate').value;
-        const co = document.getElementById('checkOutDate').value;
-        if (!name || !ci || !co) return;
-        const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
-        const fmt = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-        document.getElementById('successSummary').textContent =
-            name + ' · ' + fmt(ci) + ' → ' + fmt(co) + ' (' + nights + ' night' + (nights !== 1 ? 's' : '') + ')';
-        document.getElementById('booking-success').classList.add('show');
+        const form  = e.target;
+        const name  = form.guestName.value.trim();
+        const email = form.guestEmail.value.trim();
+        const ci    = document.getElementById('checkInDate').value;
+        const co    = document.getElementById('checkOutDate').value;
+        if (!name || !email || !ci || !co) return;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalLabel = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span> Processing...';
+
+        const payment = form.querySelector('input[name="payment"]:checked').value;
+        const token   = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        try {
+            const res = await fetch('/Room/Book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify({
+                    roomId: form.roomId.value,
+                    guestName: name,
+                    guestEmail: email,
+                    checkIn: ci,
+                    checkOut: co,
+                    paymentMethod: payment
+                })
+            });
+
+            if (!res.ok) throw new Error('Booking failed');
+            const data = await res.json();
+
+            const fmt = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+            document.getElementById('successSummary').textContent =
+                name + ' · ' + fmt(ci) + ' → ' + fmt(co) +
+                ' (' + data.nights + ' night' + (data.nights !== 1 ? 's' : '') + ') · Total $' + data.total;
+            document.getElementById('booking-success').classList.add('show');
+        } catch (err) {
+            alert('Something went wrong while booking. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalLabel;
+        }
     }
     function closeSuccess() { document.getElementById('booking-success').classList.remove('show'); }
 </script>
