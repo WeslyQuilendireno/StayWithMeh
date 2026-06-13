@@ -1,14 +1,19 @@
+@model StayWithMeh.Models.Room
 @{
     ViewData["Title"] = "Room Details";
     ViewData["ActivePage"] = "Rooms";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var roomId = ViewData["RoomId"] ?? 1;
-    var roomType = ViewData["RoomType"] ?? "Business Suite";
-    var roomNum = ViewData["RoomNum"] ?? "Room 402";
-    var floor = ViewData["Floor"] ?? "Executive Floor";
-    var priceNight = ViewData["Price"] ?? "$285";
-    var basePrice = ViewData["BasePrice"] ?? 250;
+    var isAvailable = Model.Status.Equals("available", StringComparison.OrdinalIgnoreCase);
+
+    var pillsByType = new Dictionary<string, string[]>
+    {
+        { "Business Suite", new[] { "Work Desk", "City View", "Smart Lighting", "Nespresso Machine" } },
+        { "Standard",       new[] { "King Bed", "Smart TV", "Marble Bathroom" } },
+        { "Deluxe Suite",   new[] { "Ocean View", "King Bed", "Balcony", "Marble Bathroom" } },
+        { "Family Suite",   new[] { "Sleeps 4", "Kitchenette", "Bathtub" } }
+    };
+    var pills = pillsByType.TryGetValue(Model.RoomType, out var p) ? p : new[] { "Free WiFi", "Smart TV", "AC" };
 }
 
 <style>
@@ -55,37 +60,41 @@
     .modal-card { animation: fadeUp 0.3s ease; }
 </style>
 
-<!-- BREADCRUMB -->
 <div class="max-w-[1440px] mx-auto px-gutter pt-lg pb-sm flex items-center gap-xs text-label-sm text-on-surface-variant">
     <a asp-controller="Room" asp-action="Index" class="hover:text-primary transition-colors">Rooms</a>
     <span class="material-symbols-outlined text-[14px]">chevron_right</span>
     <a asp-controller="Explore" asp-action="Index" class="hover:text-primary transition-colors">Explore</a>
     <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-    <span class="text-primary font-semibold">@roomType</span>
+    <span class="text-primary font-semibold">@Model.RoomType</span>
 </div>
 
 <main class="max-w-[1440px] mx-auto px-gutter pb-xl flex flex-col md:flex-row gap-xl items-start">
 
-    <!-- LEFT COLUMN -->
     <div class="flex-1 space-y-lg min-w-0">
 
-        <!-- Carousel -->
         <section class="relative group">
             <div class="w-full h-[420px] md:h-[480px] rounded-xl overflow-hidden shadow-sm relative" id="carousel">
                 <img id="carousel-img"
                      class="w-full h-full object-cover"
-                     src="/images/rooms/BookingSampleImage/BookingSample1.avif"
-                     alt="@roomType" />
+                     src="@Model.ImageUrl"
+                     alt="@Model.RoomType" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent flex items-end p-lg pointer-events-none">
                     <div>
-                        <span class="bg-primary text-white text-label-sm font-label-sm px-md py-xs rounded-full mb-sm inline-block uppercase tracking-wider">@roomType</span>
-                        <h1 class="text-white font-headline-lg text-headline-lg">@floor — @roomNum</h1>
+                        <span class="bg-primary text-white text-label-sm font-label-sm px-md py-xs rounded-full mb-sm inline-block uppercase tracking-wider">@Model.RoomType</span>
+                        <h1 class="text-white font-headline-lg text-headline-lg">Room @Model.RoomNumber</h1>
                     </div>
                 </div>
                 <div class="absolute top-md right-md">
-                    <span class="bg-green-100 text-green-800 font-label-sm text-label-sm px-md py-xs rounded-full flex items-center gap-xs">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
-                    </span>
+                    @if (isAvailable)
+                    {
+                        <span class="bg-green-100 text-green-800 font-label-sm text-label-sm px-md py-xs rounded-full flex items-center gap-xs">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="bg-red-100 text-red-800 font-label-sm text-label-sm px-md py-xs rounded-full">Unavailable</span>
+                    }
                 </div>
                 <button onclick="prevSlide()" class="absolute left-md top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
                     <span class="material-symbols-outlined">chevron_left</span>
@@ -94,10 +103,10 @@
                     <span class="material-symbols-outlined">chevron_right</span>
                 </button>
             </div>
-            <!-- Thumbnails -->
+            <!-- Thumbnail 1 is the room's own Supabase image; 2-3 are shared sample shots -->
             <div class="flex gap-md mt-md overflow-x-auto hide-scrollbar pb-1">
                 <div class="thumb-item active flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden" onclick="goToSlide(0)">
-                    <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample1.avif" alt="View 1" />
+                    <img class="w-full h-full object-cover" src="@Model.ImageUrl" alt="View 1" />
                 </div>
                 <div class="thumb-item flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all" onclick="goToSlide(1)">
                     <img class="w-full h-full object-cover" src="/images/rooms/BookingSampleImage/BookingSample2.avif" alt="View 2" />
@@ -108,7 +117,6 @@
             </div>
         </section>
 
-        <!-- Amenities Bento -->
         <section class="grid grid-cols-2 md:grid-cols-4 gap-md">
             <div class="amenity-card bg-surface-container-lowest p-md rounded-xl shadow-sm flex flex-col items-center text-center border border-outline-variant/20">
                 <span class="material-symbols-outlined text-primary text-3xl mb-sm">wifi</span>
@@ -132,7 +140,6 @@
             </div>
         </section>
 
-        <!-- Room Description -->
         <section class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
             <div class="flex items-start justify-between gap-md mb-md flex-wrap">
                 <h2 class="font-headline-sm text-headline-sm text-primary">Room Description</h2>
@@ -142,27 +149,21 @@
                     <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
                     <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star</span>
                     <span class="material-symbols-outlined star-filled text-amber-400 text-[18px]">star_half</span>
-                    <span class="font-bold text-label-md text-primary ml-1">4.9</span>
+                    <span class="font-bold text-label-md text-primary ml-1">4.8</span>
                     <span class="text-body-sm text-on-surface-variant">(128 reviews)</span>
                 </div>
             </div>
             <p class="text-body-md text-on-surface-variant leading-relaxed">
-                Designed specifically for the modern professional, our Business Suite offers a seamless blend
-                of productivity and comfort. The suite features a soundproof environment, perfect for video
-                conferences and deep focus. Enjoy a signature king-size sleep system, a climate-controlled
-                environment, and a dedicated refreshment station.
+                @Model.Description
             </p>
             <div class="mt-lg pt-lg border-t border-outline-variant/30 flex flex-wrap gap-sm">
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> 45 sqm Space</span>
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> City View</span>
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Nespresso Machine</span>
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Smart Lighting</span>
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> King Bed</span>
-                <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Marble Bathroom</span>
+                @foreach (var pill in pills)
+                {
+                    <span class="feature-pill"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> @pill</span>
+                }
             </div>
         </section>
 
-        <!-- What's Nearby -->
         <section class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
             <h2 class="font-headline-sm text-headline-sm text-primary mb-md">What's Nearby</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
@@ -198,10 +199,8 @@
         </section>
     </div>
 
-    <!-- RIGHT COLUMN — Sticky Booking Sidebar -->
     <aside class="booking-aside w-full md:w-[400px] shrink-0 space-y-lg">
 
-        <!-- Pricing Card -->
         <div class="bg-primary text-white p-lg rounded-xl shadow-lg relative overflow-hidden">
             <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
             <div class="relative z-10">
@@ -210,7 +209,7 @@
                     <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">auto_awesome</span>
                 </div>
                 <div class="flex items-baseline gap-xs">
-                    <span class="text-display-lg font-display-lg" id="priceDisplay">@priceNight</span>
+                    <span class="text-display-lg font-display-lg" id="priceDisplay">$@Model.PricePerNight.ToString("0.00")</span>
                     <span class="text-body-sm opacity-80">/ night</span>
                 </div>
                 <div class="mt-md space-y-sm text-body-sm opacity-90">
@@ -224,12 +223,11 @@
             </div>
         </div>
 
-        <!-- Booking Form -->
         <div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant/20">
             <h2 class="font-headline-sm text-headline-sm text-primary mb-lg">Complete Booking</h2>
             <form class="space-y-md" id="bookingForm" onsubmit="submitBooking(event)">
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="roomId" value="@roomId" />
+                <input type="hidden" name="roomId" value="@Model.Id" />
 
                 <div>
                     <label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs uppercase tracking-wide">Guest Name</label>
@@ -314,7 +312,6 @@
             </form>
         </div>
 
-        <!-- Policy -->
         <div class="bg-surface-container p-md rounded-xl border border-outline-variant/20">
             <div class="flex items-start gap-md">
                 <span class="material-symbols-outlined text-on-surface-variant shrink-0">info</span>
@@ -327,7 +324,6 @@
     </aside>
 </main>
 
-<!-- SUCCESS OVERLAY -->
 <div id="booking-success" role="dialog" aria-modal="true">
     <div class="modal-card bg-surface-container-lowest rounded-2xl shadow-2xl p-xl max-w-md w-full mx-gutter text-center border border-outline-variant/20">
         <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-lg">
@@ -352,7 +348,7 @@
 @section Scripts {
 <script>
     const slides = [
-        "/images/rooms/BookingSampleImage/BookingSample1.avif",
+        "@Model.ImageUrl",
         "/images/rooms/BookingSampleImage/BookingSample2.avif",
         "/images/rooms/BookingSampleImage/BookingSample3.avif"
     ];
@@ -374,7 +370,7 @@
         document.getElementById('guestCount').textContent = guests;
     }
 
-    const BASE_PRICE = @basePrice;
+    const BASE_PRICE = @Model.BasePrice;
     function recalcPrice() {
         const ci = document.getElementById('checkInDate').value;
         const co = document.getElementById('checkOutDate').value;
