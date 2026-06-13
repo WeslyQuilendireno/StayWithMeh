@@ -1,11 +1,19 @@
+@model StayWithMeh.Models.ExploreViewModel
 @{
     ViewData["Title"]      = "Explore Destinations & Rooms";
     ViewData["ActivePage"] = "Explore";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var roomTypeIcons = new Dictionary<string, (string icon, string label)>
+    {
+        { "Business Suite", ("desk", "Work Desk") },
+        { "Standard",       ("king_bed", "King Bed") },
+        { "Deluxe Suite",   ("waves", "Ocean View") },
+        { "Family Suite",   ("family_restroom", "Sleeps 4") }
+    };
 }
 
 <style>
-    /* ── Carousel ── */
     #carouselTrack {
         display: flex;
         width: max-content;
@@ -36,11 +44,9 @@
     .dest-card.active-branch .ring  { opacity: 1; }
     .dest-card.inactive-branch      { opacity: 0.45; transition: opacity 0.2s; }
 
-    /* arrow btn disabled look */
     #btnPrev:disabled, #btnNext:disabled { opacity: 0.3; cursor: not-allowed; }
 </style>
 
-<!-- ═══ SEARCH BAR ═══ -->
 <section class="mt-lg px-gutter max-w-[1440px] mx-auto">
     <form asp-controller="Explore" asp-action="Index" method="get">
         <div class="bg-surface-container-lowest rounded-full shadow-md border border-outline-variant p-2
@@ -93,7 +99,7 @@
                 <select name="type" class="bg-transparent border-none text-label-md p-0 pr-6 focus:ring-0">
                     <option>All Types</option>
                     <option>Standard</option>
-                    <option>Deluxe</option>
+                    <option>Deluxe Suite</option>
                     <option>Business Suite</option>
                     <option>Family Suite</option>
                 </select>
@@ -117,7 +123,6 @@
     </form>
 </section>
 
-<!-- ═══ 8 GLOBAL BRANCHES ═══ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex justify-between items-end mb-lg">
         <div>
@@ -138,150 +143,33 @@
         </div>
     </div>
 
-    <!-- Viewport clips the track -->
     <div class="overflow-hidden pb-6">
         <div id="carouselTrack">
 
-            <!-- 1. New York -->
-            <div class="dest-card" data-city="New York">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/newyorkUS.jpg" alt="New York" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">New York</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United States 🇺🇸</p>
+            @foreach (var property in Model.Properties)
+            {
+                var roomCount = Model.Rooms.Count(r => r.PropertyId == property.Id);
+
+                <div class="dest-card" data-city="@property.City" data-property-id="@property.Id">
+                    <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
+                        <img class="w-full h-full object-cover object-center"
+                             src="@property.ImageUrl" alt="@property.City" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
+                            <h3 class="text-white font-headline-md text-headline-md">@property.City</h3>
+                            <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">@property.Country @property.FlagEmoji</p>
+                        </div>
+                        <div class="ring"></div>
                     </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">1,240 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-            <!-- 2. London -->
-            <div class="dest-card" data-city="London">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/londonUK.jpg" alt="London" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">London</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Kingdom 🇬🇧</p>
+                    <div class="flex justify-between items-center px-1">
+                        <span class="text-label-md font-semibold text-on-surface">@roomCount Room@(roomCount != 1 ? "s" : "")</span>
+                        <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
                     </div>
-                    <div class="ring"></div>
                 </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">890 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
+            }
 
-            <!-- 3. Tokyo -->
-            <div class="dest-card" data-city="Tokyo">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/tokyoJP.jpg" alt="Tokyo" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Tokyo</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Japan 🇯🇵</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">2,150 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <!-- 4. Dubai -->
-            <div class="dest-card" data-city="Dubai">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/dubaiUAE.jpg" alt="Dubai" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Dubai</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">United Arab Emirates 🇦🇪</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">1,020 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-            <!-- 5. Caracas -->
-            <div class="dest-card" data-city="Caracas">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/caracasVEN.jpg" alt="Caracas" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Caracas</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Venezuela 🇻🇪</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">340 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-            <!-- 6. Addis Ababa -->
-            <div class="dest-card" data-city="Addis Ababa">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/addisAbabaETH.jpg" alt="Addis Ababa" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Addis Ababa</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Ethiopia 🇪🇹</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">280 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-            <!-- 7. Melbourne -->
-            <div class="dest-card" data-city="Melbourne">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/melbourneAUS.jpg" alt="Melbourne" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Melbourne</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Australia 🇦🇺</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">760 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-            <!-- 8. Singapore -->
-            <div class="dest-card" data-city="Singapore">
-                <div class="relative h-[380px] rounded-2xl overflow-hidden mb-4 shadow-sm">
-                    <img class="w-full h-full object-cover object-center"
-                         src="~/images/explore_page/MarinaBaySG.jpg" alt="Singapore" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent flex flex-col justify-end p-6">
-                        <h3 class="text-white font-headline-md text-headline-md">Singapore</h3>
-                        <p class="text-white/70 text-[11px] font-bold uppercase tracking-widest mt-1">Singapore 🇸🇬</p>
-                    </div>
-                    <div class="ring"></div>
-                </div>
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-label-md font-semibold text-on-surface">920 Properties</span>
-                    <span class="material-symbols-outlined text-primary">arrow_right_alt</span>
-                </div>
-            </div>
-
-        </div><!-- /#carouselTrack -->
-    </div><!-- /viewport -->
-
-    <!-- Active branch bar -->
     <div id="activeBranchBar"
          class="hidden mt-xs flex items-center justify-between bg-primary/5
                 border border-primary/20 rounded-xl px-lg py-sm">
@@ -298,7 +186,6 @@
     </div>
 </section>
 
-<!-- ═══ AVAILABLE ROOMS ═══ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
         <h2 class="font-headline-lg text-headline-lg text-primary">Available Rooms</h2>
@@ -325,117 +212,81 @@
 
     <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
 
-        <!-- Skyline Executive Suite -->
-        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
-            <div class="relative h-64 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/AvailableRooms_SkylineExecutiveSuite.png" alt="Skyline Executive Suite" />
-                <div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Premium</div>
-                <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-label-sm font-bold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
-                </div>
-            </div>
-            <div class="p-lg flex-1 flex flex-col">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-headline-sm text-headline-sm text-primary">Skyline Executive Suite</h3>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-md">4.9</span>
+        @foreach (var room in Model.Rooms)
+        {
+            var isAvailable = room.Status.Equals("available", StringComparison.OrdinalIgnoreCase);
+            var icon  = roomTypeIcons.TryGetValue(room.RoomType, out var iv) ? iv.icon  : "bed";
+            var label = roomTypeIcons.TryGetValue(room.RoomType, out var lv) ? lv.label : "Room";
+
+            <div class="room-result-card bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm
+                        overflow-hidden flex flex-col group hover:shadow-md @(isAvailable ? "hover:-translate-y-1" : "") transition-all"
+                 data-property-id="@room.PropertyId">
+                <div class="relative h-64 overflow-hidden">
+                    <img class="w-full h-full object-cover @(isAvailable ? "" : "opacity-80") transition-transform duration-700 group-hover:scale-105"
+                         src="@room.ImageUrl" alt="@room.RoomType" />
+                    <div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">@room.RoomType</div>
+                    <div class="absolute top-4 right-4">
+                        @if (isAvailable)
+                        {
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-label-sm font-bold flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Available
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-label-sm font-bold">Unavailable</span>
+                        }
                     </div>
                 </div>
-                <p class="text-on-surface-variant font-body-sm mb-lg">Spacious corner suite with floor-to-ceiling windows overlooking the financial district.</p>
-                <div class="flex gap-md mb-lg flex-wrap">
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">wifi</span><span class="text-label-sm">Free WiFi</span></div>
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">ac_unit</span><span class="text-label-sm">Full AC</span></div>
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">tv</span><span class="text-label-sm">Smart TV</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
-                    <div>
-                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
-                        <div class="flex items-center gap-2">
-                            <span class="font-headline-md text-headline-md text-primary">$320</span>
-                            <span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-medium">AI Priced</span>
+                <div class="p-lg flex-1 flex flex-col @(isAvailable ? "" : "opacity-80")">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-headline-sm text-headline-sm text-primary">@room.RoomType — Room @room.RoomNumber</h3>
+                        <div class="flex items-center gap-1 text-primary">
+                            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+                            <span class="font-bold text-label-md">4.8</span>
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="1"
-                           class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md hover:bg-primary-container transition-colors">Book Now</a>
+                    <p class="text-on-surface-variant font-body-sm mb-lg">@room.Description</p>
+                    <div class="flex gap-md mb-lg flex-wrap">
+                        <div class="flex items-center gap-1.5 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-sm">@icon</span>
+                            <span class="text-label-sm">@label</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-sm">wifi</span>
+                            <span class="text-label-sm">Free WiFi</span>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
+                        <div>
+                            <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
+                            <span class="font-headline-md text-headline-md text-primary">$@room.PricePerNight.ToString("0.00")</span>
+                        </div>
+                        <div class="flex gap-2">
+                            @if (isAvailable)
+                            {
+                                <a asp-controller="Room" asp-action="Details" asp-route-id="@room.Id"
+                                   class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md hover:bg-primary-container transition-colors">Book Now</a>
+                            }
+                            else
+                            {
+                                <button class="bg-surface-container text-outline px-6 py-2.5 rounded-full font-label-md cursor-not-allowed">Join Waitlist</button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
 
-        <!-- Urban Deluxe King -->
-        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col group hover:shadow-md hover:-translate-y-1 transition-all">
-            <div class="relative h-64 overflow-hidden">
-                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/AvailableRooms_UrbanDeluxeKing.png" alt="Urban Deluxe King" />
-                <div class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Business Choice</div>
-                <div class="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-label-sm font-bold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Available
-                </div>
-            </div>
-            <div class="p-lg flex-1 flex flex-col">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-headline-sm text-headline-sm text-primary">Urban Deluxe King</h3>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-md">4.7</span>
-                    </div>
-                </div>
-                <p class="text-on-surface-variant font-body-sm mb-lg">A refined space designed for the modern professional with an ergonomic workspace.</p>
-                <div class="flex gap-md mb-lg flex-wrap">
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">laptop_mac</span><span class="text-label-sm">Workstation</span></div>
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">coffee</span><span class="text-label-sm">Espresso</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
-                    <div>
-                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-md text-headline-md text-primary">$215</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <a asp-controller="Room" asp-action="Details" asp-route-id="2"
-                           class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md hover:bg-primary-container transition-colors">Book Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
 
-        <!-- Grand Family Loft — Fully Booked -->
-        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all">
-            <div class="relative h-64 overflow-hidden">
-                <img class="w-full h-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
-                     src="~/images/explore_page/AvailableRooms_GrandFamilyLoft.png" alt="Grand Family Loft" />
-                <div class="absolute top-4 left-4 bg-outline text-surface px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Family</div>
-                <div class="absolute top-4 right-4 bg-red-100 text-red-800 px-3 py-1 rounded-full text-label-sm font-bold">Fully Booked</div>
-            </div>
-            <div class="p-lg flex-1 flex flex-col opacity-80">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-headline-sm text-headline-sm text-primary">Grand Family Loft</h3>
-                    <div class="flex items-center gap-1 text-primary">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
-                        <span class="font-bold text-label-md">4.5</span>
-                    </div>
-                </div>
-                <p class="text-on-surface-variant font-body-sm mb-lg">Dual-level loft with separate sleeping areas and child-friendly amenities.</p>
-                <div class="flex gap-md mb-lg flex-wrap">
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">family_restroom</span><span class="text-label-sm">4 Guests</span></div>
-                    <div class="flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-sm">kitchen</span><span class="text-label-sm">Kitchenette</span></div>
-                </div>
-                <div class="mt-auto pt-lg border-t border-outline-variant/30 flex justify-between items-end">
-                    <div>
-                        <p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1">Per Night</p>
-                        <span class="font-headline-md text-headline-md text-primary">$450</span>
-                    </div>
-                    <button class="bg-surface-container text-outline px-6 py-2.5 rounded-full font-label-md cursor-not-allowed">Join Waitlist</button>
-                </div>
-            </div>
-        </div>
-
+    <div id="noRoomsMessage" class="hidden text-center py-xl">
+        <span class="material-symbols-outlined text-outline text-[48px] mb-md block">hotel</span>
+        <p class="font-headline-sm text-headline-sm text-on-surface mb-xs">No rooms available in this branch yet</p>
+        <p class="text-body-sm text-on-surface-variant">Check back soon, or explore other branches.</p>
     </div>
 </section>
 
-<!-- ═══ FLASH OFFER + STANDARDS ═══ -->
 <section class="mt-xl px-gutter max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-lg">
     <div class="bg-primary-container p-xl rounded-3xl relative overflow-hidden">
         <div class="relative z-10">
@@ -469,7 +320,6 @@
     </div>
 </section>
 
-<!-- Trust Bar -->
 <section class="px-gutter max-w-[1440px] mx-auto my-xl">
     <div class="bg-surface-container-high p-lg rounded-2xl flex flex-col md:flex-row items-center justify-between gap-lg">
         <div class="flex items-center gap-md">
@@ -496,12 +346,10 @@
 
 @section Scripts {
 <script>
-    // ── Price slider ──
     document.getElementById('priceRange')?.addEventListener('input', function () {
         document.getElementById('priceDisplay').textContent = '$' + this.value;
     });
 
-    // ── Grid / List toggle ──
     document.getElementById('gridBtn')?.addEventListener('click', function () {
         document.getElementById('roomsGrid').className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg';
     });
@@ -509,29 +357,24 @@
         document.getElementById('roomsGrid').className = 'grid grid-cols-1 gap-lg';
     });
 
-    // ══════════════════════════════════════════════
-    // CAROUSEL — pure translateX infinite wrap
-    // window.onload ensures Tailwind CDN is done
-    // ══════════════════════════════════════════════
+    // window.onload ensures Tailwind CDN has finished layout before measuring card widths
     window.addEventListener('load', function () {
         var track   = document.getElementById('carouselTrack');
         var btnPrev = document.getElementById('btnPrev');
         var btnNext = document.getElementById('btnNext');
         if (!track || !btnPrev || !btnNext) return;
 
-        var CARD_W    = 300;
-        var GAP       = 24;
-        var STEP      = CARD_W + GAP;   // 324px per card
-        var total     = track.querySelectorAll('.dest-card').length; // 8
-        var VISIBLE   = 4;              // always show exactly 4 at start
-        var maxIndex  = total - VISIBLE;
-        var current   = 0;
+        var CARD_W   = 300;
+        var GAP      = 24;
+        var STEP     = CARD_W + GAP;
+        var total    = track.querySelectorAll('.dest-card').length;
+        var VISIBLE  = Math.min(4, total);
+        var maxIndex = Math.max(0, total - VISIBLE);
+        var current  = 0;
         var animating = false;
 
-        // Set initial position
         track.style.transform = 'translateX(0px)';
 
-        // Size the viewport to show exactly 4 cards
         var viewportEl = track.parentElement;
         viewportEl.style.width = (VISIBLE * CARD_W + (VISIBLE - 1) * GAP) + 'px';
         viewportEl.style.maxWidth = '100%';
@@ -552,18 +395,19 @@
         btnPrev.addEventListener('click', function () { move(-1); });
     });
 
-    // ── Branch filter ──
     var activeCity = null;
+    var activePropertyId = null;
 
     document.querySelectorAll('.dest-card').forEach(function (card) {
         card.addEventListener('click', function () {
-            filterByCity(card.dataset.city);
+            filterByBranch(card.dataset.city, card.dataset.propertyId);
         });
     });
 
-    function filterByCity(city) {
+    function filterByBranch(city, propertyId) {
         if (activeCity === city) { clearBranchFilter(); return; }
         activeCity = city;
+        activePropertyId = propertyId;
 
         document.querySelectorAll('.dest-card').forEach(function (c) {
             if (c.dataset.city === city) {
@@ -578,15 +422,33 @@
         document.getElementById('destinationInput').value = city;
         document.getElementById('activeBranchName').textContent = city;
         document.getElementById('activeBranchBar').classList.remove('hidden');
+
+        applyRoomFilter();
     }
 
     function clearBranchFilter() {
         activeCity = null;
+        activePropertyId = null;
         document.querySelectorAll('.dest-card').forEach(function (c) {
             c.classList.remove('active-branch', 'inactive-branch');
         });
         document.getElementById('destinationInput').value = '';
         document.getElementById('activeBranchBar').classList.add('hidden');
+        applyRoomFilter();
+    }
+
+    function applyRoomFilter() {
+        var cards = document.querySelectorAll('.room-result-card');
+        var visibleCount = 0;
+
+        cards.forEach(function (card) {
+            var matches = !activePropertyId || card.dataset.propertyId === activePropertyId;
+            card.style.display = matches ? 'flex' : 'none';
+            if (matches) visibleCount++;
+        });
+
+        document.getElementById('noRoomsMessage').classList.toggle('hidden', visibleCount > 0);
+        document.getElementById('roomsGrid').classList.toggle('hidden', visibleCount === 0);
     }
 </script>
 }
