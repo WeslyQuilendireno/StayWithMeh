@@ -20,9 +20,16 @@ namespace StayWithMeh.Controllers
 
             // No guest auth yet — once login exists, add
             // .Where(b => b.GuestId == currentGuestId) here
-            var result = await _supabase.From<Booking>().Get();
+            var bookingsResult = await _supabase.From<Booking>().Get();
+            var roomsResult    = await _supabase.From<Room>().Get();
 
-            return View(result.Models);
+            var model = new MyBookingsViewModel
+            {
+                Bookings  = bookingsResult.Models,
+                RoomsById = roomsResult.Models.ToDictionary(r => r.Id)
+            };
+
+            return View(model);
         }
     }
 }
