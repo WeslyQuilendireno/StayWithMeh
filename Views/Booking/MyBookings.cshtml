@@ -1,4 +1,4 @@
-@model List<StayWithMeh.Models.Booking>
+@model StayWithMeh.Models.MyBookingsViewModel
 @{
     ViewData["Title"]      = "My Bookings";
     ViewData["ActivePage"] = "Bookings";
@@ -26,7 +26,7 @@
             <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">My Bookings</h1>
             <p class="font-body-md text-body-md text-on-surface-variant">Manage and track all your reservations</p>
         </div>
-        @if (Model.Any())
+        @if (Model.Bookings.Any())
         {
             <button class="flex items-center gap-xs bg-surface-container-lowest border border-outline-variant
                            px-md py-sm rounded-lg text-on-surface font-label-md hover:bg-surface-container
@@ -37,7 +37,7 @@
         }
     </header>
 
-    @if (!Model.Any())
+    @if (!Model.Bookings.Any())
     {
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm">
             <div class="empty-state">
@@ -89,16 +89,23 @@
         </section>
 
         <section class="grid grid-cols-1 gap-gutter" id="bookingsContainer">
-            @foreach (var booking in Model)
+            @foreach (var booking in Model.Bookings)
             {
                 var nights = (booking.CheckOut - booking.CheckIn).Days;
+                var room   = Model.RoomsById.TryGetValue(booking.RoomId, out var r) ? r : null;
 
                 <div class="booking-card" data-status="@booking.Status.ToLower()">
                     <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden
                                 flex flex-col md:flex-row border border-outline-variant/20
                                 hover:shadow-md transition-all group">
 
-                        <div class="md:w-[340px] md:min-w-[340px] relative overflow-hidden h-64 md:h-auto">
+                        <div class="md:w-[340px] md:min-w-[340px] relative overflow-hidden h-64 md:h-auto bg-surface-container">
+                            @if (room is not null)
+                            {
+                                <img class="absolute inset-0 w-full h-full object-cover
+                                            transition-transform duration-500 group-hover:scale-105"
+                                     src="@room.ImageUrl" alt="@room.RoomType" />
+                            }
                             <div class="absolute top-md left-md">
                                 <span class="bg-primary text-on-primary font-label-sm text-label-sm
                                              px-md py-xs rounded-full uppercase tracking-wider">@booking.Status</span>
@@ -108,7 +115,10 @@
                         <div class="flex-1 p-lg flex flex-col justify-between gap-md">
                             <div class="flex flex-col md:flex-row justify-between items-start gap-sm">
                                 <div>
-                                    <h2 class="font-headline-sm text-headline-sm text-primary">Booking #@booking.Id.Substring(0, 8).ToUpper()</h2>
+                                    <h2 class="font-headline-sm text-headline-sm text-primary">
+                                        @(room is not null ? $"{room.RoomType} — Room {room.RoomNumber}" : "Booking")
+                                    </h2>
+                                    <p class="text-on-surface-variant text-label-sm font-label-sm mt-xs">Booking #@booking.Id.Substring(0, 8).ToUpper()</p>
                                 </div>
                                 <div class="text-right shrink-0">
                                     <p class="font-headline-md text-headline-md text-primary">$@booking.TotalAmount.ToString("0.00")</p>
