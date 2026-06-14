@@ -118,32 +118,52 @@ Complete all guest-facing UI, fix critical bugs, add runtime compilation, and pr
 ### Sprint Goal
 Wire all guest-facing pages to real Supabase data and implement the full booking flow end-to-end.
 
-### Planned Tasks
+### Completed
 
 #### Models
-- [ ] `Models/Room.cs` — map to `rooms` Supabase table
-- [ ] `Models/Guest.cs` — map to `guests` table
-- [ ] `Models/Booking.cs` — map to `bookings` table
-- [ ] `Models/Invoice.cs` — map to `invoices` table
+- `Models/Room.cs` — mapped to `rooms` table, includes `PropertyId` and `BasePrice`
+- `Models/Guest.cs` — mapped to `guests` table
+- `Models/Booking.cs` — mapped to `bookings` table
+- `Models/Invoice.cs` — mapped to `invoices` table
+- `Models/Property.cs` — new model for the 8-branch `properties` table
+- `Models/ExploreViewModel.cs` — bundles `Properties` and `Rooms` for the Explore page
+- `Models/BookingRequest.cs` — DTO for the `/Room/Book` POST payload
+
+#### Database
+- Fixed table name mismatch: renamed `invoice` → `invoices`
+- Added `base_price` and `property_id` columns to `rooms`
+- Created `properties` table with FK constraint `fk_rooms_property`
+- Added `GRANT` statements for `anon`/`authenticated` roles ahead of Supabase's October 2026 Data API enforcement
+- Seeded 8 properties (all branches) and 6 rooms (all linked to New York, with real `base_price` values)
+- Resolved duplicate-seed issue by wiping and reseeding both tables via combined `sql/seed_all.sql`
+- Final verified state: 8 properties, 6 rooms
 
 #### Supabase Connection
-- [ ] Configure Supabase client in `Program.cs` using User Secrets
-- [ ] Create `Services/SupabaseService.cs` as a singleton wrapper
+- `Program.cs` reads `Supabase:Url` and `Supabase:Key` from User Secrets
+- `Supabase.Client` registered as a singleton via DI, initialized with `AutoConnectRealtime = true`
+- Documented secrets split in `SETUP.md`: User Secrets for anon key (ASP.NET app), `pricing/.env` for service_role key (Python, deferred)
 
 #### Pages — Live Data
-- [ ] `Explore/Index` — fetch rooms from Supabase, replace static cards
-- [ ] `Room/Index` — fetch rooms filtered by status
-- [ ] `Room/Details` — display selected room's real data
-- [ ] `Booking/MyBookings` — fetch guest bookings from Supabase
-- [ ] `Wishlist/Index` — persist saved rooms to Supabase instead of sessionStorage
+- `Room/Index` — converted to `@model List<Room>`, renders all 6 rooms via `@foreach`, filter tabs aligned to real `room_type` values, booking modal uses real UUIDs
+- `Room/Details` — converted to `@model Room`, all `ViewData` reads replaced with `@Model.*`, feature pills generated per room type, carousel slide 1 uses the room's real image
+- `Explore/Index` — converted to `@model ExploreViewModel`, 8 branch cards render from `properties` with live room counts, "Available Rooms" renders from `rooms`, branch click filters rooms by `property_id`
+- `Booking/MyBookings` — converted to `@model List<Booking>`, shows empty state when no bookings exist, renders real booking cards (dates, nights, total, status) when present
+- `Wishlist/Index` — confirmed working as-is; `sessionStorage` already keys off `data-room-id`, which now holds real Supabase UUIDs
 
 #### Booking Flow
-- [ ] Wire `RoomController.Book()` POST to insert into `bookings` table
-- [ ] Generate invoice record on booking confirmation
-- [ ] Add `PropertyId` to room catalogue linking rooms to branches
+- `RoomController.Book()` POST action — validates input, recalculates total server-side (base price × nights + 12% tax + $5/night levy), looks up guest by email or creates a new `guests` row, inserts `Booking` (`status = "upcoming"`) and linked `Invoice`, returns JSON with `bookingId`, `total`, `nights`
+- Added email field to both booking forms (`Room/Index` modal and `Room/Details`) — used for guest lookup-or-create, designed to be replaced by login state once auth exists
+- `submitBooking()` and `submitModalBooking()` now POST to `/Room/Book` via `fetch()`, with loading state and server-calculated total in the success overlay
+- Configured `AddAntiforgery` with `HeaderName = "RequestVerificationToken"` in `Program.cs` to support JSON POSTs from fetch
 
-#### Authentication (stretch goal)
-- [ ] Guest login / register flow using Supabase Auth
+#### Folder Cleanup
+- Moved and renamed `RoomDetails&Booking/DetailsAndBooking.cshtml` → `Room/Details.cshtml` to match MVC convention (`RoomController.Details()` now resolves the view automatically)
+
+### Design Decisions
+
+- **Guest identity without auth:** booking forms collect name + email; the controller looks up an existing `guests` row by email or creates one. This is intentionally structured so that when a login/signup modal is added later, it becomes the source of the email instead of a raw form field — no booking logic changes required.
+- **Branch-aware room filtering:** Explore page filters rooms by `property_id` rather than by name matching, so additional branches can have rooms added later with zero further wiring.
+- **Server-side price recalculation:** the booking total is never trusted from the client; `RoomController.Book()` recomputes it from `room.BasePrice` to prevent tampering.
 
 ---
 
@@ -152,11 +172,11 @@ Wire all guest-facing pages to real Supabase data and implement the full booking
 ### Pages
 ```
 ✅ Guest Landing Page (Home)
-✅ Explore Destinations & Rooms
-✅ My Bookings
-✅ Room Browse (with booking modal)
-✅ Room Details & Booking
-✅ Saved Rooms Wishlist
+✅ Explore Destinations & Rooms (live Supabase data)
+✅ My Bookings (live data + empty state)
+✅ Room Browse (live data + booking modal)
+✅ Room Details & Booking (live data + booking form)
+✅ Saved Rooms Wishlist (UUID-compatible)
 ✅ Customer Support Center
 ⬜ Receptionist Bookings Dashboard
 ⬜ Rooms Management Dashboard
@@ -166,13 +186,11 @@ Wire all guest-facing pages to real Supabase data and implement the full booking
 ### Backend
 ```
 ✅ Supabase project created
-✅ Database tables created (rooms, guests, bookings, invoices)
-✅ Supabase C# package installed
-✅ RoomController with static catalogue (rooms 1–6)
-⬜ C# Models created
-⬜ Supabase connection in Program.cs
-⬜ Live data fetching
-⬜ Booking POST to Supabase
+✅ Database tables created (properties, rooms, guests, bookings, invoices)
+✅ Supabase C# package installed and wired in Program.cs
+✅ C# Models created (Room, Guest, Booking, Invoice, Property)
+✅ Live data fetching across Explore, Room/Index, Room/Details, MyBookings
+✅ Booking POST to Supabase (guests, bookings, invoices)
 ⬜ Python AI pricing microservice
 ```
 
@@ -189,5 +207,18 @@ Wire all guest-facing pages to real Supabase data and implement the full booking
 
 ---
 
-*Last updated: June 11, 2026*
-*Next update: End of Week 3*
+## Week 4 — June 22–28, 2026
+
+### Sprint Goal
+TBD — candidates: Guest Auth (soft-gate login modal), Receptionist/Manager dashboards, or Python pricing microservice.
+
+### Planned Tasks
+- [ ] Guest login/register modal triggered on Book Now click or after a delay
+- [ ] Replace email-based guest lookup with authenticated session once login exists
+- [ ] `MyBookings` — scope query to logged-in guest
+- [ ] Begin Receptionist Bookings Dashboard or Python pricing microservice (TBD)
+
+---
+
+*Last updated: June 12, 2026*
+*Next update: End of Week 4*
