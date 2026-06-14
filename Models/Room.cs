@@ -33,6 +33,9 @@ namespace StayWithMeh.Models
         [Column("image_url")]
         public string ImageUrl { get; set; } = string.Empty;
 
+        [Column("floor")]
+        public int? Floor { get; set; }
+
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
     }
