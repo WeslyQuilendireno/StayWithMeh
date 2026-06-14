@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StayWithMeh.Models;
 using Supabase;
-using Supabase.Postgrest.Exceptions;
 
 namespace StayWithMeh.Controllers
 {
@@ -46,8 +45,7 @@ namespace StayWithMeh.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(BookingRequest request)
+        public async Task<IActionResult> Book([FromBody] BookingRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.GuestEmail) ||
                 string.IsNullOrWhiteSpace(request.GuestName) ||
