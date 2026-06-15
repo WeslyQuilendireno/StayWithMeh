@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StayWithMeh OS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#efedf0",
+                        "on-surface": "#1b1b1e",
+                        "surface-bright": "#fbf8fc",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3f6",
+                        "secondary": "#5d5e61",
+                        "on-surface-variant": "#44474e",
+                        "surface-container-highest": "#e4e2e5",
+                        "secondary-container": "#dfdfe2",
+                        "secondary-fixed": "#e2e2e5",
+                        "on-secondary-fixed": "#1a1c1e",
+                        "outline-variant": "#c5c6cf",
+                        "primary-container": "#1a2b4b",
+                        "on-primary-container": "#8293b8",
+                        "background": "#fbf8fc",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#75777f",
+                        "primary": "#031635",
+                        "surface-container-high": "#e9e7eb",
+                        "surface": "#fbf8fc",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffddb1",
+                        "on-tertiary-fixed": "#291800",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary-fixed": "#081b3a"
+                    },
+                    spacing: {
+                        "lg": "24px", "xs": "4px", "gutter": "24px",
+                        "sm": "8px", "md": "16px", "xl": "32px",
+                        "base": "8px"
+                    },
+                    fontSize: {
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f7; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface">
+
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container flex flex-col p-md z-40">
+
+    <div class="flex items-center gap-md px-md py-lg mb-xl">
+        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary">apartment</span>
+        </div>
+        <div>
+            <h1 class="text-headline-sm font-black text-primary leading-tight">StayWithMeh</h1>
+            <p class="text-label-sm text-on-surface-variant opacity-70">Operations Hub</p>
+        </div>
+    </div>
+
+    <nav class="flex-1 space-y-2">
+        <a asp-controller="Receptionist" asp-action="Index"
+           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                  @(ViewData["ActiveStaffPage"]?.ToString() == "Overview"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant hover:bg-surface-container-high")">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-label-md font-bold">Overview</span>
+        </a>
+        <a asp-controller="Receptionist" asp-action="Bookings"
+           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                  @(ViewData["ActiveStaffPage"]?.ToString() == "Bookings"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant hover:bg-surface-container-high")">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span class="text-label-md font-bold">Bookings</span>
+        </a>
+        <a asp-controller="Receptionist" asp-action="Rooms"
+           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                  @(ViewData["ActiveStaffPage"]?.ToString() == "Rooms"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant hover:bg-surface-container-high")">
+            <span class="material-symbols-outlined">bed</span>
+            <span class="text-label-md font-bold">Rooms</span>
+        </a>
+        <a asp-controller="Receptionist" asp-action="Analytics"
+           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                  @(ViewData["ActiveStaffPage"]?.ToString() == "Analytics"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant hover:bg-surface-container-high")">
+            <span class="material-symbols-outlined">bar_chart</span>
+            <span class="text-label-md font-bold">Analytics</span>
+        </a>
+        <a asp-controller="Receptionist" asp-action="Guests"
+           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                  @(ViewData["ActiveStaffPage"]?.ToString() == "Guests"
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant hover:bg-surface-container-high")">
+            <span class="material-symbols-outlined">group</span>
+            <span class="text-label-md font-bold">Guests</span>
+        </a>
+    </nav>
+
+    <div class="space-y-2 border-t border-outline-variant/30 pt-md">
+        <a href="#"
+           class="flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all">
+            <span class="material-symbols-outlined">help_outline</span>
+            <span class="text-label-md font-bold">Help</span>
+        </a>
+        <a asp-controller="Account" asp-action="Logout"
+           class="flex items-center gap-md px-md py-sm rounded-xl text-error hover:bg-error/10 transition-all">
+            <span class="material-symbols-outlined">logout</span>
+            <span class="text-label-md font-bold">Logout</span>
+        </a>
+    </div>
+</aside>
+
+<div class="ml-[280px] flex flex-col min-h-screen">
+
+    <header class="sticky top-0 z-30 bg-surface-container-lowest border-b border-outline-variant/20
+                   px-lg py-md flex items-center justify-between shadow-sm">
+        <div>
+            <h2 class="text-headline-sm font-headline-sm text-primary">@ViewData["Title"]</h2>
+            <p class="text-body-sm text-on-surface-variant" id="staff-datetime"></p>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="relative w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+            </button>
+            <button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="flex items-center gap-sm pl-md border-l border-outline-variant/30">
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                    <span class="text-on-primary text-label-sm font-bold">@(ViewData["StaffInitials"] ?? "ST")</span>
+                </div>
+                <div class="hidden md:block">
+                    <p class="text-label-md font-bold text-on-surface leading-none">@(ViewData["StaffName"] ?? "Staff")</p>
+                    <p class="text-label-sm text-on-surface-variant">@(ViewData["StaffRole"] ?? "Staff")</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 p-lg">
+        @RenderBody()
+    </main>
+</div>
+
+<!-- Floating emergency button -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-error text-on-error rounded-full shadow-2xl
+               flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50"
+        title="Emergency Alert">
+    <span class="material-symbols-outlined">priority_high</span>
+</button>
+
+<script>
+    // Updates the header datetime every minute
+    function updateDatetime() {
+        const now = new Date();
+        const opts = { weekday: 'long', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const el = document.getElementById('staff-datetime');
+        if (el) el.textContent = now.toLocaleDateString('en-US', opts).replace(',', ' |');
+    }
+    setInterval(updateDatetime, 60000);
+    updateDatetime();
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
