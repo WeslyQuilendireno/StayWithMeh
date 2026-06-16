@@ -1,0 +1,172 @@
+@model StayWithMeh.Models.ManagerDashboardViewModel
+@{
+    ViewData["Title"]          = "Staff Operations";
+    ViewData["ActiveStaffPage"] = "Staff";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<div class="grid grid-cols-12 gap-lg">
+
+    <!-- ── Left column ── -->
+    <div class="col-span-12 lg:col-span-8 flex flex-col gap-lg">
+
+        <!-- Current Shift Schedule -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden">
+            <div class="p-lg flex items-center justify-between border-b border-outline-variant/10">
+                <div>
+                    <h2 class="text-headline-sm font-headline-sm text-primary">Current Shift Schedule</h2>
+                    <p class="text-body-sm text-on-surface-variant mt-1">Manage shifts, oversight, and departmental performance.</p>
+                </div>
+                <div class="flex gap-1 bg-surface-container rounded-full p-1">
+                    <button class="px-md py-xs rounded-full text-label-sm font-bold bg-primary text-on-primary">Today</button>
+                    <button class="px-md py-xs rounded-full text-label-sm font-bold text-on-surface-variant">Weekly</button>
+                </div>
+            </div>
+
+            <div class="p-lg space-y-sm">
+                @foreach (var shift in Model.Shifts)
+                {
+                    var (badgeBg, badgeText) = shift.Status switch
+                    {
+                        "active"  => ("bg-green-100", "text-green-800"),
+                        "pending" => ("bg-amber-100", "text-amber-800"),
+                        _         => ("bg-surface-container", "text-on-surface-variant")
+                    };
+                    var initials = string.Concat(shift.StaffName.Split(' ').Take(2).Select(w => w[0]));
+
+                    <div class="flex items-center justify-between p-md rounded-xl hover:bg-surface-container-low transition-colors">
+                        <div class="flex items-center gap-md">
+                            <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container
+                                        flex items-center justify-center font-bold text-label-md">
+                                @initials
+                            </div>
+                            <div>
+                                <p class="text-label-md font-bold text-on-surface">@shift.StaffName</p>
+                                <p class="text-body-sm text-on-surface-variant">
+                                    @shift.Department &middot; @shift.StartTime.ToString(@"hh\:mm") - @shift.EndTime.ToString(@"hh\:mm")
+                                </p>
+                            </div>
+                        </div>
+                        <span class="px-md py-xs rounded-full text-label-sm font-bold capitalize @badgeBg @badgeText">
+                            @shift.Status
+                        </span>
+                    </div>
+                }
+            </div>
+
+            <button class="w-full py-md text-center text-label-md font-bold text-on-surface bg-surface-container-low
+                           hover:bg-surface-container transition-colors">
+                Manage All Staff
+            </button>
+        </div>
+
+        <!-- Floor 1 Overview -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg">
+            <div class="flex items-center justify-between mb-md">
+                <h2 class="text-headline-sm font-headline-sm text-primary">Floor 1 Overview</h2>
+                <div class="flex gap-md text-label-sm">
+                    <span class="flex items-center gap-xs text-on-surface-variant">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Available
+                    </span>
+                    <span class="flex items-center gap-xs text-on-surface-variant">
+                        <span class="w-2 h-2 rounded-full bg-primary"></span> Occupied
+                    </span>
+                    <span class="flex items-center gap-xs text-on-surface-variant">
+                        <span class="w-2 h-2 rounded-full bg-orange-400"></span> Dirty
+                    </span>
+                </div>
+            </div>
+
+            @if (!Model.FloorOneRooms.Any())
+            {
+                <p class="text-body-sm text-on-surface-variant py-lg text-center">No rooms on Floor 1 yet.</p>
+            }
+            else
+            {
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-md">
+                    @foreach (var room in Model.FloorOneRooms)
+                    {
+                        var (bg, text) = room.Status switch
+                        {
+                            "occupied"    => ("bg-primary/10 border-primary/20",       "text-primary"),
+                            "dirty"       => ("bg-orange-50 border-orange-200",        "text-orange-700"),
+                            "maintenance" => ("bg-amber-50 border-amber-200",          "text-amber-700"),
+                            _             => ("bg-green-50 border-green-200",          "text-green-700")
+                        };
+
+                        <div class="border @bg rounded-xl p-md text-center">
+                            <p class="text-headline-sm font-black @text">@room.RoomNumber</p>
+                            <p class="text-label-sm @text opacity-80">@room.RoomType</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Right column ── -->
+    <aside class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+
+        <!-- Room Occupancy -->
+        <div class="bg-primary text-on-primary p-lg rounded-2xl">
+            <p class="text-label-sm uppercase tracking-widest opacity-70">Room Occupancy</p>
+            <div class="flex items-baseline gap-sm mt-xs">
+                <span class="text-display-lg font-bold">@Model.OccupancyPercent</span>
+                <span class="text-headline-md">%</span>
+            </div>
+            <div class="grid grid-cols-2 gap-md mt-lg">
+                <div class="bg-on-primary/10 rounded-xl p-md">
+                    <p class="text-label-sm opacity-70">Available</p>
+                    <p class="text-headline-md font-bold">@Model.AvailableCount</p>
+                </div>
+                <div class="bg-on-primary/10 rounded-xl p-md">
+                    <p class="text-label-sm opacity-70">Dirty</p>
+                    <p class="text-headline-md font-bold">@Model.DirtyCount</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manager Toolkit -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg">
+            <h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-md">Manager Toolkit</h3>
+            <div class="space-y-sm">
+                <button class="w-full flex items-center justify-between p-md rounded-xl bg-surface-container-low
+                               hover:bg-surface-container transition-colors text-left">
+                    <span class="text-label-md font-bold text-on-surface">Update Inventory</span>
+                    <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+                </button>
+                <button class="w-full flex items-center justify-between p-md rounded-xl bg-surface-container-low
+                               hover:bg-surface-container transition-colors text-left">
+                    <span class="text-label-md font-bold text-on-surface">Staff Incident Report</span>
+                    <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+                </button>
+                <button class="w-full flex items-center justify-between p-md rounded-xl bg-surface-container-low
+                               hover:bg-surface-container transition-colors text-left">
+                    <span class="text-label-md font-bold text-on-surface">Bulk Discount Approval</span>
+                    <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+                </button>
+            </div>
+        </div>
+
+        <!--
+            Recent Tickets has no real backing table yet — shown as a
+            clearly-labeled placeholder until a support_tickets table exists.
+        -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg">
+            <div class="flex items-center justify-between mb-md">
+                <h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest">Recent Tickets</h3>
+                <span class="bg-error text-on-error px-sm py-xs rounded-full text-[10px] font-bold">DEMO DATA</span>
+            </div>
+            <div class="space-y-md">
+                <div>
+                    <p class="text-label-md font-bold text-on-surface">AC Unit Room 402</p>
+                    <p class="text-body-sm text-on-surface-variant">Guest reporting loud rattling noise...</p>
+                </div>
+                <div>
+                    <p class="text-label-md font-bold text-on-surface">Late Checkout #110</p>
+                    <p class="text-body-sm text-on-surface-variant">Request for 2PM departure due to flight delay...</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
