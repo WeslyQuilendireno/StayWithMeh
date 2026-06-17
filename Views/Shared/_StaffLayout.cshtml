@@ -92,46 +92,72 @@
         var navController = ViewData["StaffRoleContext"]?.ToString() ?? "Receptionist";
     }
     <nav class="flex-1 space-y-2">
-        <a asp-controller="@navController" asp-action="Index"
-           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
-                  @(ViewData["ActiveStaffPage"]?.ToString() == "Overview" || ViewData["ActiveStaffPage"]?.ToString() == "Staff"
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "text-on-surface-variant hover:bg-surface-container-high")">
-            <span class="material-symbols-outlined">dashboard</span>
-            <span class="text-label-md font-bold">@(navController == "Manager" ? "Staff Operations" : "Overview")</span>
-        </a>
-        <a asp-controller="@navController" asp-action="Bookings"
-           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
-                  @(ViewData["ActiveStaffPage"]?.ToString() == "Bookings"
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "text-on-surface-variant hover:bg-surface-container-high")">
-            <span class="material-symbols-outlined">calendar_month</span>
-            <span class="text-label-md font-bold">Bookings</span>
-        </a>
-        <a asp-controller="@navController" asp-action="Rooms"
-           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
-                  @(ViewData["ActiveStaffPage"]?.ToString() == "Rooms"
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "text-on-surface-variant hover:bg-surface-container-high")">
-            <span class="material-symbols-outlined">bed</span>
-            <span class="text-label-md font-bold">Rooms</span>
-        </a>
-        <a asp-controller="@navController" asp-action="Analytics"
-           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
-                  @(ViewData["ActiveStaffPage"]?.ToString() == "Analytics"
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "text-on-surface-variant hover:bg-surface-container-high")">
-            <span class="material-symbols-outlined">bar_chart</span>
-            <span class="text-label-md font-bold">Analytics</span>
-        </a>
-        <a asp-controller="@navController" asp-action="Guests"
-           class="flex items-center gap-md px-md py-sm rounded-xl transition-all
-                  @(ViewData["ActiveStaffPage"]?.ToString() == "Guests"
-                    ? "bg-primary text-on-primary shadow-md"
-                    : "text-on-surface-variant hover:bg-surface-container-high")">
-            <span class="material-symbols-outlined">group</span>
-            <span class="text-label-md font-bold">Guests</span>
-        </a>
+        @if (navController == "Housekeeping")
+        {
+            <a asp-controller="Housekeeping" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Housekeeping"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">cleaning_services</span>
+                <span class="text-label-md font-bold">Housekeeping</span>
+            </a>
+            <a asp-controller="Housekeeping" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      text-on-surface-variant hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">bed</span>
+                <span class="text-label-md font-bold">Room Status</span>
+            </a>
+            <a href="#"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      text-on-surface-variant hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">badge</span>
+                <span class="text-label-md font-bold">Staff Profile</span>
+            </a>
+        }
+        else
+        {
+            <a asp-controller="@navController" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Overview" || ViewData["ActiveStaffPage"]?.ToString() == "Staff"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-label-md font-bold">@(navController == "Manager" ? "Staff Operations" : "Overview")</span>
+            </a>
+            <a asp-controller="@navController" asp-action="Bookings"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Bookings"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span class="text-label-md font-bold">Bookings</span>
+            </a>
+            <a asp-controller="@navController" asp-action="Rooms"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Rooms"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">bed</span>
+                <span class="text-label-md font-bold">Rooms</span>
+            </a>
+            <a asp-controller="@navController" asp-action="Analytics"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Analytics"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span class="text-label-md font-bold">Analytics</span>
+            </a>
+            <a asp-controller="@navController" asp-action="Guests"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      @(ViewData["ActiveStaffPage"]?.ToString() == "Guests"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant hover:bg-surface-container-high")">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-label-md font-bold">Guests</span>
+            </a>
+        }
     </nav>
 
     <div class="space-y-2 border-t border-outline-variant/30 pt-md">
