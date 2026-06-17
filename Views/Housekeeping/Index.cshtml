@@ -1,0 +1,217 @@
+@model StayWithMeh.Models.HousekeepingDashboardViewModel
+@{
+    ViewData["Title"]           = "Housekeeping Dashboard";
+    ViewData["ActiveStaffPage"] = "Housekeeping";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<!-- Stat cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md mb-lg">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg flex items-center justify-between">
+        <div>
+            <p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Total Rooms</p>
+            <p class="text-display-lg font-bold text-primary mt-xs">@Model.TotalRooms</p>
+        </div>
+        <span class="material-symbols-outlined text-primary/30 text-[36px]">bed</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg flex items-center justify-between">
+        <div>
+            <p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Dirty / Checkout</p>
+            <p class="text-display-lg font-bold text-error mt-xs">@Model.DirtyCount</p>
+        </div>
+        <span class="material-symbols-outlined text-error/30 text-[36px]">cleaning_services</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg flex items-center justify-between">
+        <div>
+            <p class="text-label-sm text-on-surface-variant uppercase tracking-widest">In Progress</p>
+            <p class="text-display-lg font-bold text-amber-600 mt-xs">@Model.InProgressCount</p>
+        </div>
+        <span class="material-symbols-outlined text-amber-600/30 text-[36px]">autorenew</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg flex items-center justify-between">
+        <div>
+            <p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Cleaned Today</p>
+            <p class="text-display-lg font-bold text-green-600 mt-xs">@Model.CleanedTodayCount</p>
+        </div>
+        <span class="material-symbols-outlined text-green-600/30 text-[36px]">verified</span>
+    </div>
+</div>
+
+<div class="grid grid-cols-12 gap-lg">
+
+    <!-- Priority Tasks -->
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-md">
+        <div class="flex items-center justify-between">
+            <h2 class="text-headline-sm font-headline-sm text-primary">Priority Tasks</h2>
+            <button class="text-label-sm font-bold text-primary hover:underline">View Schedule</button>
+        </div>
+
+        @if (!Model.PendingTasks.Any())
+        {
+            <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg text-center">
+                <span class="material-symbols-outlined text-outline text-[36px] mb-sm block">task_alt</span>
+                <p class="text-body-sm text-on-surface-variant">No pending tasks. Great work!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var task in Model.PendingTasks)
+            {
+                var (badgeBg, badgeText, label) = task.Priority == "urgent"
+                    ? ("bg-error/10", "text-error", "URGENT")
+                    : ("bg-amber-100", "text-amber-800", "STANDARD");
+
+                <div class="task-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 p-lg"
+                     data-task-id="@task.Id">
+                    <div class="flex items-center justify-between mb-sm">
+                        <span class="px-sm py-xs rounded-md text-[10px] font-bold uppercase tracking-widest @badgeBg @badgeText">
+                            @label
+                        </span>
+                        @if (task.DueAt.HasValue)
+                        {
+                            <span class="text-label-sm text-on-surface-variant">Due @task.DueAt.Value.ToString("h:mm tt")</span>
+                        }
+                    </div>
+                    <h3 class="text-label-md font-bold text-on-surface">
+                        Room @Model.RoomNumberFor(task.RoomId) - @Model.RoomTypeFor(task.RoomId)
+                    </h3>
+                    <p class="text-body-sm text-on-surface-variant mt-xs">@task.Description</p>
+
+                    @if (task.Status == "pending")
+                    {
+                        <button onclick="updateTaskStatus('@task.Id', 'in_progress')"
+                                class="w-full mt-md py-sm bg-primary text-on-primary rounded-xl text-label-md font-bold
+                                       hover:bg-primary-container transition-colors">
+                            Start Now
+                        </button>
+                    }
+                    else
+                    {
+                        <button onclick="updateTaskStatus('@task.Id', 'completed')"
+                                class="w-full mt-md py-sm bg-surface-container text-on-surface rounded-xl text-label-md font-bold
+                                       hover:bg-surface-container-high transition-colors">
+                            Mark Complete
+                        </button>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Room Inventory grid -->
+    <div class="col-span-12 lg:col-span-8">
+        <div class="flex items-center justify-between mb-md">
+            <h2 class="text-headline-sm font-headline-sm text-primary">Room Inventory</h2>
+            <div class="flex gap-1 bg-surface-container rounded-full p-1">
+                <button onclick="filterInventory('all', this)"
+                        class="inv-tab px-md py-xs rounded-full text-label-sm font-bold bg-primary text-on-primary">All</button>
+                <button onclick="filterInventory('dirty', this)"
+                        class="inv-tab px-md py-xs rounded-full text-label-sm font-bold text-on-surface-variant">Dirty</button>
+                <button onclick="filterInventory('in_progress', this)"
+                        class="inv-tab px-md py-xs rounded-full text-label-sm font-bold text-on-surface-variant">In Progress</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-md" id="inventoryGrid">
+            @foreach (var room in Model.Rooms.OrderBy(r => r.RoomNumber))
+            {
+                var (borderColor, badgeBg, badgeText) = room.Status switch
+                {
+                    "dirty"       => ("border-l-error",   "bg-error/10",   "text-error"),
+                    "in_progress" => ("border-l-amber-400","bg-amber-100", "text-amber-800"),
+                    "maintenance" => ("border-l-amber-400","bg-amber-100", "text-amber-800"),
+                    "occupied"    => ("border-l-primary",  "bg-primary/10","text-primary"),
+                    _             => ("border-l-green-400","bg-green-100", "text-green-800")
+                };
+
+                <div class="inv-card bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10
+                            border-l-4 @borderColor p-md" data-status="@room.Status">
+                    <div class="flex items-center justify-between mb-sm">
+                        <span class="text-headline-sm font-black text-on-surface">@room.RoomNumber</span>
+                        <span class="px-sm py-xs rounded-md text-[10px] font-bold uppercase @badgeBg @badgeText">
+                            @room.Status.Replace("_", " ")
+                        </span>
+                    </div>
+                    <p class="text-label-sm text-on-surface-variant mb-md">@room.RoomType</p>
+
+                    @if (room.Status == "dirty")
+                    {
+                        <button onclick="updateRoomStatus('@room.Id', 'in_progress')"
+                                class="w-full py-sm bg-primary text-on-primary rounded-lg text-label-sm font-bold
+                                       hover:bg-primary-container transition-colors">
+                            Set In Progress
+                        </button>
+                    }
+                    else if (room.Status == "in_progress")
+                    {
+                        <button onclick="updateRoomStatus('@room.Id', 'available')"
+                                class="w-full py-sm bg-amber-500 text-white rounded-lg text-label-sm font-bold
+                                       hover:bg-amber-600 transition-colors">
+                            Mark Clean
+                        </button>
+                    }
+                    else
+                    {
+                        <button onclick="updateRoomStatus('@room.Id', 'dirty')"
+                                class="w-full py-sm bg-surface-container text-on-surface-variant rounded-lg text-label-sm font-bold
+                                       hover:bg-surface-container-high transition-colors">
+                            Toggle Status
+                        </button>
+                    }
+                </div>
+            }
+
+            <button class="inv-card border-2 border-dashed border-outline-variant rounded-xl
+                           flex flex-col items-center justify-center gap-sm p-md text-on-surface-variant
+                           hover:border-primary hover:text-primary transition-colors min-h-[160px]">
+                <span class="material-symbols-outlined text-[28px]">add_circle</span>
+                <span class="text-label-sm font-bold uppercase tracking-widest">Report Broken Item</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function filterInventory(status, btn) {
+        document.querySelectorAll('.inv-tab').forEach(t => {
+            t.classList.remove('bg-primary', 'text-on-primary');
+            t.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('bg-primary', 'text-on-primary');
+        btn.classList.remove('text-on-surface-variant');
+
+        document.querySelectorAll('.inv-card[data-status]').forEach(card => {
+            card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+        });
+    }
+
+    async function updateRoomStatus(roomId, newStatus) {
+        try {
+            const res = await fetch('/Housekeeping/UpdateRoomStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roomId: roomId, status: newStatus })
+            });
+            if (!res.ok) throw new Error('Update failed');
+            location.reload();
+        } catch {
+            alert('Failed to update room status. Please try again.');
+        }
+    }
+
+    async function updateTaskStatus(taskId, newStatus) {
+        try {
+            const res = await fetch('/Housekeeping/UpdateTaskStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId: taskId, status: newStatus })
+            });
+            if (!res.ok) throw new Error('Update failed');
+            location.reload();
+        } catch {
+            alert('Failed to update task status. Please try again.');
+        }
+    }
+</script>
+}
