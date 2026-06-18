@@ -92,7 +92,34 @@
         var navController = ViewData["StaffRoleContext"]?.ToString() ?? "Receptionist";
     }
     <nav class="flex-1 space-y-2">
-        @if (navController == "Housekeeping")
+        @if (navController == "SuperAdmin")
+        {
+            <a asp-controller="SuperAdmin" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      bg-primary text-on-primary shadow-md">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span class="text-label-md font-bold">Owner Dashboard</span>
+            </a>
+            <a asp-controller="Manager" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      text-on-surface-variant hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">groups</span>
+                <span class="text-label-md font-bold">Staff Operations</span>
+            </a>
+            <a asp-controller="Receptionist" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      text-on-surface-variant hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-label-md font-bold">Front Desk</span>
+            </a>
+            <a asp-controller="Housekeeping" asp-action="Index"
+               class="flex items-center gap-md px-md py-sm rounded-xl transition-all
+                      text-on-surface-variant hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">cleaning_services</span>
+                <span class="text-label-md font-bold">Housekeeping</span>
+            </a>
+        }
+        else if (navController == "Housekeeping")
         {
             <a asp-controller="Housekeeping" asp-action="Index"
                class="flex items-center gap-md px-md py-sm rounded-xl transition-all
