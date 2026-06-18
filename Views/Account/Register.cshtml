@@ -1,0 +1,51 @@
+@model StayWithMeh.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="min-h-[70vh] flex items-center justify-center px-gutter py-xl">
+    <div class="w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant/20 p-xl">
+        <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Create Account</h1>
+        <p class="text-body-sm text-on-surface-variant mb-lg">New accounts start with Guest access. Staff roles are assigned by an Owner afterward.</p>
+
+        <form asp-controller="Account" asp-action="Register" method="post" class="flex flex-col gap-md">
+            <div asp-validation-summary="ModelOnly" class="text-error text-body-sm"></div>
+
+            <div>
+                <label class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-xs block">Full Name</label>
+                <input asp-for="FullName" type="text"
+                       class="w-full border border-outline-variant rounded-xl px-md py-sm
+                              focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                <span asp-validation-for="FullName" class="text-error text-label-sm"></span>
+            </div>
+
+            <div>
+                <label class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-xs block">Email</label>
+                <input asp-for="Email" type="email"
+                       class="w-full border border-outline-variant rounded-xl px-md py-sm
+                              focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                <span asp-validation-for="Email" class="text-error text-label-sm"></span>
+            </div>
+
+            <div>
+                <label class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-xs block">Password</label>
+                <input asp-for="Password" type="password"
+                       class="w-full border border-outline-variant rounded-xl px-md py-sm
+                              focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                <span asp-validation-for="Password" class="text-error text-label-sm"></span>
+            </div>
+
+            <button type="submit"
+                    class="bg-primary text-on-primary py-sm rounded-xl font-bold mt-sm
+                           hover:bg-primary-container transition-colors">
+                Create Account
+            </button>
+        </form>
+
+        <p class="text-body-sm text-on-surface-variant text-center mt-lg">
+            Already have an account?
+            <a asp-controller="Account" asp-action="Login" class="text-primary font-bold hover:underline">Sign In</a>
+        </p>
+    </div>
+</div>
